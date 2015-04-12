@@ -1,1 +1,7 @@
+.shaph-form fieldset {
+    display: none;
+}
 
+.shaph-form.open fieldset {
+    display: block;
+}
