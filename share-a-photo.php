@@ -92,8 +92,7 @@ class Share_A_Photo {
 	function print_javascripts() {
 		if ( $this->is_displaying_share_button ) {
 			wp_print_scripts( 'shaph-js' );
-			echo $this->render_template( 'form-base' );
-			echo $this->render_template( 'uploader' );
+			$this->print_templates();
 		}
 	}
 
@@ -101,14 +100,37 @@ class Share_A_Photo {
 		wp_enqueue_style( 'shaph-css' );
 	}
 
+	function print_templates() {
+
+		// these templates are required for every instance of share-a-photo
+		echo $this->print_template( 'form-base', SHAPH_DIR . '/inc/form-base.php' );
+		echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/uploader.php' );
+
+		// there is one optional template, the photo caption
+		$templates = array(
+			'caption' => SHAPH_DIR . '/inc/caption.php',
+		);
+		/**
+		 * Filter the list of optional templates
+		 */
+		$templates = apply_filters( 'shaph-templates', $templates );
+
+		if ( ! empty( $templates ) && is_array( $templates ) ) {
+			foreach( $templates as $name=>$file ) {
+				$this->print_template( $name, $file );
+			}
+		}
+
+	}
+
 	/**
 	 * @param $name  'form-base' || 'uploader'
 	 *
 	 * @return mixed|void
 	 */
-	function render_template( $name ) {
+	function print_template( $name, $file ) {
 		ob_start();
-		include SHAPH_DIR . '/inc/' . $name . '.php';
+		include $file;
 		$template = ob_get_contents();
 		ob_end_clean();
 		/**
