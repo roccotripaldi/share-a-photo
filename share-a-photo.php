@@ -11,8 +11,8 @@ define( 'SHAPH_DIR', dirname( __FILE__ ) );
 define( 'SHAPH_PATH', plugins_url() . '/share-a-photo/' );
 
 /**
- * creates an anonymous user
- * content shared anonymously will be attached to this user
+ * On activation, create an anonymous user.
+ * Content shared anonymously will be attached to this user.
  */
 function shaph_activate() {
 	$shaph_anonymous_user = get_option( 'shaph_anonymous_user', false );
@@ -41,22 +41,49 @@ class Share_A_Photo {
 	public $settings;
 
 	function __construct() {
-		add_shortcode( 'share_a_photo', array( $this, 'render_share_a_photo_form' ) );
+		add_shortcode( 'share_a_photo', array( $this, 'render_prompt' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_footer', array( $this, 'print_javascripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_stylesheets' ) );
 	}
 
 	function register_assets() {
-		wp_register_script( 'shaph-js', SHAPH_PATH . 'js/main.js', array( 'jquery', 'backbone', 'underscore' ) );
-		wp_register_style( 'shaph-css', SHAPH_PATH . 'css/main.css' );
+
+		$shaph_js = SHAPH_PATH . 'js/main.js';
+		/**
+		 * Filter the location of the main javascript file.
+		 */
+		$shaph_js = apply_filters( 'shaph_js', $shaph_js );
+		$shaph_js_dependencies = array( 'jquery', 'underscore' );
+		/**
+		 * Filter the dependencies of the the main javascript file.
+		 */
+		$shaph_js_dependencies = apply_filters( 'shaph_js_dependencies', $shaph_js_dependencies );
+		$shaph_css = SHAPH_PATH . 'css/main.css';
+		/**
+		 * Filters the location of the main stylesheet.
+		 */
+		$shaph_css = apply_filters( 'shaph_css', $shaph_css );
+
+		wp_register_script( 'shaph-js', $shaph_js, $shaph_js_dependencies );
+		wp_register_style( 'shaph-css', $shaph_css );
 	}
 
-	function render_share_a_photo_form( $settings ) {
+	/**
+	 * @param $settings
+	 *
+	 * array(
+	 *  'id' => (string) the html id attribute of the button element
+	 *  'text' => (string) the text of the button element
+	 * )
+	 *
+	 * @return string
+	 */
+	function render_prompt( $settings ) {
 		$this->settings = $settings ? $settings : array();
 		$this->is_displaying_share_button = true;
 		ob_start();
-		include SHAPH_DIR . '/inc/form.php';
+		include SHAPH_DIR . '/inc/prompt.php';
 		$form = ob_get_contents();
 		ob_end_clean();
 		return $form;
@@ -65,11 +92,30 @@ class Share_A_Photo {
 	function print_javascripts() {
 		if ( $this->is_displaying_share_button ) {
 			wp_print_scripts( 'shaph-js' );
+			echo $this->render_template( 'form-base' );
+			echo $this->render_template( 'uploader' );
 		}
 	}
 
 	function enqueue_stylesheets() {
 		wp_enqueue_style( 'shaph-css' );
+	}
+
+	/**
+	 * @param $name  'form-base' || 'uploader'
+	 *
+	 * @return mixed|void
+	 */
+	function render_template( $name ) {
+		ob_start();
+		include SHAPH_DIR . '/inc/' . $name . '.php';
+		$template = ob_get_contents();
+		ob_end_clean();
+		/**
+		 * Filter a template by $name.
+		 */
+		$filtered = apply_filters( 'shaph_template-' . $name, $template );
+		return $filtered;
 	}
 
 }

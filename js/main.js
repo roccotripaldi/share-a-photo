@@ -1,8 +1,6 @@
 jQuery( function() {
 
-	jQuery(".shaph-button-open").click( function() {
-		var id = jQuery(this).data("id");
-		jQuery("#" + id).addClass("open");
+	jQuery(".shaph-button").click( function() {
 		console.log('click');
 	});
 
