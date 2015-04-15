@@ -49,16 +49,18 @@ class Share_A_Photo {
 
 	function register_assets() {
 
-		$shaph_js = SHAPH_PATH . 'js/main.js';
+		wp_register_script( 'shaph-backbone', SHAPH_PATH . 'js/backbone-models.js', array('backbone') );
+		$shaph_js = SHAPH_PATH . 'js/app.js';
 		/**
 		 * Filter the location of the main javascript file.
 		 */
 		$shaph_js = apply_filters( 'shaph_js', $shaph_js );
-		$shaph_js_dependencies = array( 'jquery', 'underscore' );
+		$shaph_js_dependencies = array( 'jquery', 'underscore', 'shaph-backbone' );
 		/**
 		 * Filter the dependencies of the the main javascript file.
 		 */
 		$shaph_js_dependencies = apply_filters( 'shaph_js_dependencies', $shaph_js_dependencies );
+
 		$shaph_css = SHAPH_PATH . 'css/main.css';
 		/**
 		 * Filters the location of the main stylesheet.
@@ -67,6 +69,10 @@ class Share_A_Photo {
 
 		wp_register_script( 'shaph-js', $shaph_js, $shaph_js_dependencies );
 		wp_register_style( 'shaph-css', $shaph_css );
+
+		$shaph_js_data = array( 'App' => false );
+		$shaph_js_data = apply_filters( 'shaph-js-data', $shaph_js_data );
+		wp_localize_script( 'shaph-js', 'shareAPhoto', $shaph_js_data );
 	}
 
 	/**
