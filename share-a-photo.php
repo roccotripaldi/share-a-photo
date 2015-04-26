@@ -49,13 +49,12 @@ class Share_A_Photo {
 
 	function register_assets() {
 
-		wp_register_script( 'shaph-backbone', SHAPH_PATH . 'js/backbone-models.js', array('backbone') );
 		$shaph_js = SHAPH_PATH . 'js/app.js';
 		/**
 		 * Filter the location of the main javascript file.
 		 */
 		$shaph_js = apply_filters( 'shaph_js', $shaph_js );
-		$shaph_js_dependencies = array( 'jquery', 'underscore', 'shaph-backbone' );
+		$shaph_js_dependencies = array( 'jquery', 'underscore', 'backbone' );
 		/**
 		 * Filter the dependencies of the the main javascript file.
 		 */
