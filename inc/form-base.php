@@ -11,7 +11,6 @@ $cancel_button_text = apply_filters( 'shaph_cancel_button_text', $cancel_button_
 		</fieldset>
 
 		<input type="button" id="shaph-cancel" value="<?php echo $cancel_button_text; ?>" />
-		<input type="button" id="shaph-action" value="upload" />
 
 	</form>
 </div>

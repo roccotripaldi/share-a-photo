@@ -54,7 +54,7 @@ class Share_A_Photo {
 		 * Filter the location of the main javascript file.
 		 */
 		$shaph_js = apply_filters( 'shaph_js', $shaph_js );
-		$shaph_js_dependencies = array( 'jquery', 'underscore', 'backbone' );
+		$shaph_js_dependencies = array( 'jquery', 'underscore', 'backbone', 'plupload' );
 		/**
 		 * Filter the dependencies of the the main javascript file.
 		 */

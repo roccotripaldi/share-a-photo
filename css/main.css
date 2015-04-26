@@ -12,3 +12,24 @@
     top: 0px;
     left: 0px;
 }
+
+#shaph-form form {
+    background-color: white;
+    width: 90%;
+    position: fixed;
+    top: 50px;
+    left: 5%;
+    height: auto;
+    min-height: 100px;
+}
+
+#shaph-form fieldset {
+    border: none;
+    outline: none;
+}
+
+#shaph-cancel {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
