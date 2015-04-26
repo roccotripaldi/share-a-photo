@@ -1,4 +1,11 @@
 <script id="shaph-template-uploader" type="text/template">
-	<input type="file" name="shaph-file" class="shaph-file" />
-	<input type="button" class="shaph-upload-button" data-id=""
+
+	<ul id="filelist"></ul>
+	<br />
+
+	<div id="container">
+		<a id="browse" href="javascript:;">[Browse...]</a>
+		<a id="start-upload" href="javascript:;">[Start Upload]</a>
+	</div>
+
 </script>

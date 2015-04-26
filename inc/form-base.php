@@ -7,7 +7,7 @@ $cancel_button_text = apply_filters( 'shaph_cancel_button_text', $cancel_button_
 <div id="shaph-form">
 	<form>
 
-		<fieldset>
+		<fieldset id="shaph-fieldset">
 		</fieldset>
 
 		<input type="button" id="shaph-cancel" value="<?php echo $cancel_button_text; ?>" />

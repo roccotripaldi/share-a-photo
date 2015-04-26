@@ -70,6 +70,12 @@ class Share_A_Photo {
 		wp_register_style( 'shaph-css', $shaph_css );
 
 		$shaph_js_data = array( 'App' => false );
+
+		$templates = $this->get_templates();
+		if ( is_array( $templates ) ) {
+			$shaph_js_data['templates'] = array_keys( $templates );
+		}
+
 		$shaph_js_data = apply_filters( 'shaph-js-data', $shaph_js_data );
 		wp_localize_script( 'shaph-js', 'shareAPhoto', $shaph_js_data );
 	}
@@ -111,14 +117,7 @@ class Share_A_Photo {
 		echo $this->print_template( 'form-base', SHAPH_DIR . '/inc/form-base.php' );
 		echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/uploader.php' );
 
-		// there is one optional template, the photo caption
-		$templates = array(
-			'caption' => SHAPH_DIR . '/inc/caption.php',
-		);
-		/**
-		 * Filter the list of optional templates
-		 */
-		$templates = apply_filters( 'shaph-templates', $templates );
+		$templates = $this->get_templates();
 
 		if ( ! empty( $templates ) && is_array( $templates ) ) {
 			foreach( $templates as $name=>$file ) {
@@ -126,6 +125,17 @@ class Share_A_Photo {
 			}
 		}
 
+	}
+
+	function get_templates() {
+		$templates = array(
+			'caption' => SHAPH_DIR . '/inc/caption.php',
+		);
+		/**
+		 * Filter the list of optional templates
+		 */
+		$templates = apply_filters( 'shaph-templates', $templates );
+		return $templates;
 	}
 
 	/**
