@@ -23,9 +23,18 @@
     min-height: 100px;
 }
 
-#shaph-form fieldset {
+#shaph-fieldset {
     border: none;
     outline: none;
+    float: right;
+}
+
+#shaph-filelist {
+    float: left;
+}
+
+.shaph-box {
+    width: 49%;
 }
 
 #shaph-cancel {
