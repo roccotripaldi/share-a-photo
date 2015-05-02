@@ -1,5 +1,7 @@
 /* global shareAPhoto */
 
+var shaphAPhotoUploader = false;
+
 var shareAPhotoFieldset = Backbone.View.extend( {
 	tagName: 'div',
 	setTemplate: function( template ) {
@@ -13,29 +15,39 @@ var shareAPhotoFieldset = Backbone.View.extend( {
 });
 
 var shareAPhotoApp = Backbone.Model.extend( {
-	currentTemplate: null,
-	uploader: null,
+	currentTemplate: false,
+	uploader: false,
 
 	initialize: function() {
 		jQuery(".shaph-button").click( this.open );
 		jQuery("#shaph-cancel").click( this.close );
-		this.uploader = new plupload.Uploader({
-			browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
-			url: 'upload.php'
-		});
 	},
 
 	open: function() {
 		var fieldset = new shareAPhotoFieldset(),
 			template = 'uploader';
 		jQuery("#shaph-form").addClass("open");
+
 		if ( shareAPhoto.App.currentTemplate && _.indexOf( shareAPhoto.templates, shareAPhoto.App.currentTemplate ) >= 0 ) {
 			template = shareAPhoto.App.currentTemplate;
 		}
+
 		jQuery("#shaph-fieldset").html( fieldset.setTemplate(template).render().el );
+
+		if ( ! shareAPhoto.App.uploader && ! shareAPhoto.App.currentTemplate ) {
+			shareAPhoto.App.uploader = new plupload.Uploader({
+				browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
+				url: 'upload.php'
+			});
+			shareAPhoto.App.uploader.init();
+		}
 	},
 	close: function() {
 		jQuery("#shaph-form").removeClass("open");
+		if ( shareAPhoto.App.uploader ) {
+			shareAPhoto.App.uploader.destroy();
+			shareAPhoto.App.uploader = false;
+		}
 	}
 } );
 
