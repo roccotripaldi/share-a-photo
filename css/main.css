@@ -26,19 +26,25 @@
 #shaph-fieldset {
     border: none;
     outline: none;
-    float: right;
-}
-
-#shaph-filelist {
-    float: left;
-}
-
-.shaph-box {
-    width: 49%;
 }
 
 #shaph-cancel {
     position: absolute;
     top: -5px;
     right: -5px;
+}
+
+#shaph-filelist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+#shaph-filelist li {
+    border-bottom: 1px solid;
+    padding: 10px 20px;
+}
+
+#shaph-filelist li b {
+    color: green;
 }
