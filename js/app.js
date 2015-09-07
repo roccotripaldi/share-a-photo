@@ -8,8 +8,8 @@ var shareAPhotoFieldset = Backbone.View.extend( {
 		this.template = _.template( jQuery('#shaph-template-' + template).html() );
 		return this;
 	},
-	render: function() {
-		this.$el.html( this.template() );
+	render: function( data ) {
+		this.$el.html( this.template( data ) );
 		return this;
 	}
 });
@@ -63,11 +63,12 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	fileUploaded: function( up, file, response ) {
 		shareAPhoto.App.fileList.push( JSON.parse( response.response ) );
-		console.log( shareAPhoto.App.fileList );
 	},
 
 	uploadComplete: function( up, files ) {
-		console.log( 'done' );
+		var fieldset = new shareAPhotoFieldset();
+		shareAPhoto.App.currentTemplate = shareAPhoto.templates[0];
+		jQuery("#shaph-fieldset").html( fieldset.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
 	},
 
 	open: function() {

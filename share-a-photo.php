@@ -127,7 +127,7 @@ class Share_A_Photo {
 
 		if ( ! empty( $templates ) && is_array( $templates ) ) {
 			foreach( $templates as $name=>$file ) {
-				$this->print_template( $name, $file );
+				echo $this->print_template( $name, $file );
 			}
 		}
 
