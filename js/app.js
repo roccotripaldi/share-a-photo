@@ -23,6 +23,22 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery("#shaph-cancel").click( this.close );
 	},
 
+	initializePluploader: function() {
+		shareAPhoto.App.uploader = new plupload.Uploader({
+			browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
+			url: '/?share_a_photo=true',
+			multipart_params: {
+				nonce: shareAPhoto.nonce
+			}
+		});
+		shareAPhoto.App.uploader.init();
+		jQuery( '#shaph-form' ).on( 'click', '#start-upload', shareAPhoto.App.startUpload );
+	},
+
+	startUpload: function() {
+		shareAPhoto.App.uploader.start();
+	},
+
 	open: function() {
 		var fieldset = new shareAPhotoFieldset(),
 			template = 'uploader';
@@ -35,11 +51,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery("#shaph-fieldset").html( fieldset.setTemplate(template).render().el );
 
 		if ( ! shareAPhoto.App.uploader && ! shareAPhoto.App.currentTemplate ) {
-			shareAPhoto.App.uploader = new plupload.Uploader({
-				browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
-				url: 'upload.php'
-			});
-			shareAPhoto.App.uploader.init();
+			shareAPhoto.App.initializePluploader();
 		}
 	},
 	close: function() {

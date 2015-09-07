@@ -45,6 +45,9 @@ class Share_A_Photo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_footer', array( $this, 'print_javascripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_stylesheets' ) );
+		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo'] ) ) {
+			add_action( 'init', array( $this, 'process_upload' ) );
+		}
 	}
 
 	function register_assets() {
@@ -69,7 +72,10 @@ class Share_A_Photo {
 		wp_register_script( 'shaph-js', $shaph_js, $shaph_js_dependencies );
 		wp_register_style( 'shaph-css', $shaph_css );
 
-		$shaph_js_data = array( 'App' => false );
+		$shaph_js_data = array(
+			'App' => false,
+			'nonce' => wp_create_nonce( 'shaph_upload' ),
+		);
 
 		$templates = $this->get_templates();
 		if ( is_array( $templates ) ) {
@@ -153,6 +159,17 @@ class Share_A_Photo {
 		 */
 		$filtered = apply_filters( 'shaph_template-' . $name, $template );
 		return $filtered;
+	}
+
+	function process_upload() {
+		error_log(
+			print_r( array(
+				'files' => $_FILES,
+				'post' => $_POST,
+			), true )
+		);
+		echo '{"OK": 1}';
+		exit;
 	}
 
 }
