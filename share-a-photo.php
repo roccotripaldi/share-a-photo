@@ -162,13 +162,20 @@ class Share_A_Photo {
 	}
 
 	function process_upload() {
-		error_log(
-			print_r( array(
-				'files' => $_FILES,
-				'post' => $_POST,
-			), true )
-		);
-		echo '{"OK": 1}';
+
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'shaph_upload' ) ) {
+			error_log( 'pooped' );
+			die( json_encode( 'Unauthorized' ) );
+		}
+
+		if ( ! function_exists( 'wp_handle_upload' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
+
+		$uploadedfile = $_FILES['file'];
+		$upload_overrides = array( 'test_form' => false );
+		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+		echo json_encode( $movefile );
 		exit;
 	}
 

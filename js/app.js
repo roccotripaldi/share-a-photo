@@ -17,6 +17,7 @@ var shareAPhotoFieldset = Backbone.View.extend( {
 var shareAPhotoApp = Backbone.Model.extend( {
 	currentTemplate: false,
 	uploader: false,
+	fileList: [],
 
 	initialize: function() {
 		jQuery(".shaph-button").click( this.open );
@@ -27,16 +28,46 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.uploader = new plupload.Uploader({
 			browse_button: 'browse', // this can be an id of a DOM element or the DOM element itself
 			url: '/?share_a_photo=true',
+			filters: {
+				mime_types: [
+					{ title: 'Images', extensions: 'jpg,gif,png' }
+				]
+			},
 			multipart_params: {
 				nonce: shareAPhoto.nonce
 			}
 		});
 		shareAPhoto.App.uploader.init();
+		shareAPhoto.App.uploader.bind( 'FilesAdded', shareAPhoto.App.filesAdded );
+		shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.uploadProgress );
+		shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.fileUploaded );
+		shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.uploadComplete );
 		jQuery( '#shaph-form' ).on( 'click', '#start-upload', shareAPhoto.App.startUpload );
 	},
 
 	startUpload: function() {
 		shareAPhoto.App.uploader.start();
+	},
+
+	filesAdded: function( up, files ) {
+		var html = '';
+		plupload.each(files, function(file) {
+			html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
+		});
+		jQuery('#shaph-filelist').html( html );
+	},
+
+	uploadProgress: function(up, file) {
+		document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+	},
+
+	fileUploaded: function( up, file, response ) {
+		shareAPhoto.App.fileList.push( JSON.parse( response.response ) );
+		console.log( shareAPhoto.App.fileList );
+	},
+
+	uploadComplete: function( up, files ) {
+		console.log( 'done' );
 	},
 
 	open: function() {
