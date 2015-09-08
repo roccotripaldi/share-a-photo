@@ -78,6 +78,8 @@ class Share_A_Photo {
 		$shaph_js_data = array(
 			'App' => false,
 			'nonce' => wp_create_nonce( 'shaph_upload' ),
+			'processUpload' => '/?share_a_photo_upload=true',
+			'processPost' => '/?share_a_photo_finish=true'
 		);
 
 		$templates = $this->get_templates();

@@ -28,7 +28,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	initializePluploader: function() {
 		shareAPhoto.App.uploader = new plupload.Uploader({
 			browse_button: 'shaph-browse', // this can be an id of a DOM element or the DOM element itself
-			url: '/?share_a_photo_upload=true',
+			url: shareAPhoto.processUpload,
 			filters: {
 				mime_types: [
 					{ title: 'Images', extensions: 'jpg,gif,png' }
@@ -82,7 +82,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		} );
 
 		jQuery.post(
-			'/?share_a_photo_finish=true',
+			shareAPhoto.processPost,
 			{
 				files: shareAPhoto.App.fileList
 			},
