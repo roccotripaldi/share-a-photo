@@ -32,8 +32,12 @@
 
 #shaph-cancel {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 0px;
+    right: 0px;
+    border: none;
+    border-radius: 0;
+    color: white;
+    background-color: red;
 }
 
 #shaph-filelist {
@@ -71,4 +75,22 @@
 
 .shaph-image-attributes label {
     display: block;
+}
+
+.shaph-footer-buttons {
+    position: absolute;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #000000;
+    left: 0px;
+    bottom: 0px;
+}
+
+.shaph-footer-buttons input {
+    margin-left: 10px;
+    background-color: greenyellow !important;
+}
+
+.shaph-content {
+    overflow: scroll;
 }

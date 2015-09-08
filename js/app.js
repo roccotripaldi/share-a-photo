@@ -23,6 +23,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery(".shaph-button").click( this.open );
 		jQuery("#shaph-cancel").click( this.close );
 		jQuery( '#shaph-form' ).on( 'click', '#shaph-finish', this.finish );
+		jQuery( document ).resize( this.setContentHeight );
 	},
 
 	initializePluploader: function() {
@@ -57,6 +58,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
 		});
 		jQuery('#shaph-filelist').html( html );
+		shareAPhoto.App.setContentHeight();
 	},
 
 	uploadProgress: function(up, file) {
@@ -71,6 +73,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		var fieldset = new shareAPhotoFieldset();
 		shareAPhoto.App.currentTemplate = shareAPhoto.templates[0];
 		jQuery("#shaph-fieldset").html( fieldset.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
+		shareAPhoto.App.setContentHeight();
 	},
 
 	finish: function() {
@@ -114,6 +117,13 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.App.initializePluploader();
 		}
 	},
+
+	setContentHeight: function() {
+		var h = jQuery( '#shaph-form' ).height() - 130;
+		console.log( h )
+		jQuery( '.shaph-content' ).css( 'height', h );
+	},
+
 	close: function() {
 		jQuery("#shaph-bg").removeClass("open");
 		if ( shareAPhoto.App.uploader ) {
@@ -121,9 +131,11 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.App.uploader = false;
 		}
 	},
+
 	disableButtons: function() {
 		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
 	}
+
 } );
 
 jQuery( function() {

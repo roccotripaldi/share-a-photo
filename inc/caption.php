@@ -6,7 +6,7 @@
 		Tell us about your photo
 		<% } %>
 	</h3>
-	<form id="shaph-image-attributes-form">
+	<form id="shaph-image-attributes-form" class="shaph-content">
 		<% for( var file in files ) { %>
 		<div class="shaph-uploaded-image">
 			<img src="<%= files[file].url %>" width="80" />
