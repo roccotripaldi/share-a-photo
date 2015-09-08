@@ -45,8 +45,11 @@ class Share_A_Photo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_footer', array( $this, 'print_javascripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_stylesheets' ) );
-		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo'] ) ) {
+		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo_upload'] ) ) {
 			add_action( 'init', array( $this, 'process_upload' ) );
+		}
+		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo_finish'] ) ) {
+			add_action( 'init', array( $this, 'finish' ) );
 		}
 	}
 
@@ -176,6 +179,12 @@ class Share_A_Photo {
 		$upload_overrides = array( 'test_form' => false );
 		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
 		echo json_encode( $movefile );
+		exit;
+	}
+
+	function finish() {
+		error_log( print_r( $_POST, true ) );
+		echo 'poop';
 		exit;
 	}
 

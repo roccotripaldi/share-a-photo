@@ -1,11 +1,11 @@
-#shaph-form {
+#shaph-bg {
     display: none;
 }
 
-#shaph-form.open {
+#shaph-bg.open {
     display: block;
     position: fixed;
-    background: rgba( 0, 0, 0, 0.5 );
+    background: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     z-index: 1000;
@@ -13,7 +13,7 @@
     left: 0px;
 }
 
-#shaph-form form {
+#shaph-form  {
     background-color: white;
     width: 90%;
     position: fixed;
@@ -27,6 +27,7 @@
 #shaph-fieldset {
     border: none;
     outline: none;
+    padding: 10px;
 }
 
 #shaph-cancel {
@@ -43,7 +44,7 @@
 
 #shaph-filelist li {
     border-bottom: 1px solid;
-    padding: 10px 20px;
+    padding: 10px 0;
 }
 
 #shaph-filelist li b {
@@ -51,7 +52,7 @@
 }
 
 .shaph-uploaded-image {
-    padding: 10px 20px;
+    padding: 10px 0;
     border-bottom: 1px solid;
     display: flex;
     align-items: center;

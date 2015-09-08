@@ -6,17 +6,20 @@
 		Tell us about your photo
 		<% } %>
 	</h3>
-	<% for( var file in files ) { %>
+	<form id="shaph-image-attributes-form">
+		<% for( var file in files ) { %>
 		<div class="shaph-uploaded-image">
 			<img src="<%= files[file].url %>" width="80" />
 			<div class="shaph-image-attributes">
 				<label>Title</label>
-				<input class="text-input" type="text" name="fileMeta[<%= file %>][title]" />
+				<input class="shaph-image-title" type="text" name="fileMeta[]" />
 				<label>Caption</label>
-				<textarea class="text-input" name="fileMeta[<%= file %>][caption]"></textarea>
+				<textarea class="shaph-image-caption" name="fileMeta[]]"></textarea>
 			</div>
 		</div>
-	<% } %>
+		<% } %>
+	</form>
+
 	<div class="shaph-footer-buttons">
 		<input type="button" id="shaph-finish" value="finish" />
 	</div>
