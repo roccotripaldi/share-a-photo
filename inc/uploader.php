@@ -14,5 +14,4 @@ $uploader_labels = apply_filters( 'shaph_uploader_labels', $uploader_labels );
 		<input type="button" id="shaph-browse" value="<?php echo esc_attr( $uploader_labels['browse'] ); ?>" />
 		<input type="button" id="shaph-start-upload" value="<?php echo esc_attr( $uploader_labels['upload'] ); ?>" />
 	</div>
-
 </script>

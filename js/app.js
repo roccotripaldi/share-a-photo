@@ -47,6 +47,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	startUpload: function() {
+		shareAPhoto.App.disableButtons();
 		shareAPhoto.App.uploader.start();
 	},
 
@@ -73,6 +74,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	finish: function() {
+		shareAPhoto.App.disableButtons();
 		jQuery('.shaph-image-title').each( function( index, value ) {
 			shareAPhoto.App.fileList[ index ].title = jQuery( value ).val();
 		} );
@@ -90,6 +92,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			function( response) {
 				var fieldset = new shareAPhotoFieldset();
 				shareAPhoto.App.currentTemplate = false;
+				shareAPhoto.App.fileList = [];
 				jQuery("#shaph-fieldset").html( fieldset.setTemplate( 'thank-you' ).render( response ).el );
 			},
 			'json'
@@ -117,6 +120,9 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.App.uploader.destroy();
 			shareAPhoto.App.uploader = false;
 		}
+	},
+	disableButtons: function() {
+		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
 	}
 } );
 
