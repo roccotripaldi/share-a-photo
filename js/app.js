@@ -84,11 +84,15 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery.post(
 			shareAPhoto.processPost,
 			{
-				files: shareAPhoto.App.fileList
+				files: shareAPhoto.App.fileList,
+				nonce: shareAPhoto.nonce
 			},
 			function( response) {
-				alert( response );
-			}
+				var fieldset = new shareAPhotoFieldset();
+				shareAPhoto.App.currentTemplate = false;
+				jQuery("#shaph-fieldset").html( fieldset.setTemplate( 'thank-you' ).render( response ).el );
+			},
+			'json'
 		);
 	},
 

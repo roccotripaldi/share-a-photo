@@ -127,6 +127,7 @@ class Share_A_Photo {
 		// these templates are required for every instance of share-a-photo
 		echo $this->print_template( 'form-base', SHAPH_DIR . '/inc/form-base.php' );
 		echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/uploader.php' );
+		echo $this->print_template( 'thank-you', SHAPH_DIR . '/inc/thank-you.php' );
 
 		$templates = $this->get_templates();
 
@@ -186,7 +187,7 @@ class Share_A_Photo {
 
 	function finish() {
 		error_log( print_r( $_POST, true ) );
-		echo 'poop';
+		echo json_encode( array( 'message' => 'poop' ) );
 		exit;
 	}
 
