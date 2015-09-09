@@ -212,6 +212,7 @@ class Share_A_Photo {
 				'post_mime_type' => $filetype['type'],
 				'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
 				'post_content'   => '',
+				'post_excerpt'   => $image['caption'],
 				'post_status'    => 'inherit'
 			);
 			$attachment_options = apply_filters( 'shaph_pre_attachment', $attachment_options );
