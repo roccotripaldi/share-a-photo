@@ -21,7 +21,6 @@
     left: 5%;
     height: 80%;
     min-height: 100px;
-    overflow: scroll;
 }
 
 #shaph-fieldset {
@@ -89,6 +88,10 @@
 .shaph-footer-buttons input {
     margin-left: 10px;
     background-color: greenyellow !important;
+}
+
+.shaph-footer-buttons input:disabled {
+    opacity: 0.4;
 }
 
 .shaph-content {

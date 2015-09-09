@@ -170,7 +170,6 @@ class Share_A_Photo {
 	function process_upload() {
 
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'shaph_upload' ) ) {
-			error_log( 'pooped' );
 			die( json_encode( 'Unauthorized' ) );
 		}
 
@@ -186,8 +185,52 @@ class Share_A_Photo {
 	}
 
 	function finish() {
-		error_log( print_r( $_POST, true ) );
-		echo json_encode( array( 'message' => 'poop' ) );
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'shaph_upload' ) ) {
+			die( json_encode( 'Unauthorized' ) );
+		}
+		global $current_user;
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+		$post_author = is_user_logged_in() ? $current_user->ID : get_option( 'shaph_anonymous_user' );
+		$post_status = is_user_logged_in() ? 'publish' : 'pending';
+		$message = is_user_logged_in() ? 'Thanks for sharing!' : 'Thanks for sharing! Your post will be published pending moderation.';
+
+		foreach( $_POST['files'] as $image ) {
+			$pre_post_options = array(
+				'post_title' => $image['title'],
+				'post_status' => $post_status,
+				'post_author' => $post_author,
+			);
+			$pre_post_options = apply_filters( 'shaph_pre_post', $pre_post_options, $image );
+			$post_id = wp_insert_post( $pre_post_options );
+
+			$filename = $image['file'];
+			$filetype = wp_check_filetype( basename( $filename ), null );
+			$wp_upload_dir = wp_upload_dir();
+
+			$attachment_options = array(
+				'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
+				'post_mime_type' => $filetype['type'],
+				'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+				'post_content'   => '',
+				'post_status'    => 'inherit'
+			);
+			$attachment_options = apply_filters( 'shaph_pre_attachment', $attachment_options );
+			$attach_id = wp_insert_attachment( $attachment_options, $filename, $post_id );
+			$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+			$attach_data['image_meta']['caption'] = $image['caption'];
+			$attach_data = apply_filters( 'shaph_attachment_data', $attach_data, $attach_id, $image );
+			wp_update_attachment_metadata( $attach_id, $attach_data );
+			$post_content = '<a href="' . esc_url( $image['url'] ) . '">';
+			$post_content .= '<img class="wp-image-' . $attach_id . ' size-full" src="' . esc_url( $image['url'] ) . '" alt="' . esc_attr( $image['title'] ) . '" width="' . $attach_data['width'] . '" height="' . $attach_data['height'] . '" /></a>';
+			if( ! empty( $image['caption'] ) ) {
+				$post_content = '[caption id="attachment_' . $attach_id . '" align="alignnon" width="' . $attach_data['width'] . '"]' . $post_content . ' ' . $image['caption'] . '[/caption]';
+			}
+			$post_content = apply_filters( 'shaph_post_content', $post_content, $post_id, $attach_id );
+			wp_update_post( array( 'ID' => $post_id, 'post_content' => $post_content ) );
+			do_action( 'shaph_post_created', $post_id, $attach_id );
+		}
+
+		echo json_encode( array( 'message' => $message ) );
 		exit;
 	}
 
