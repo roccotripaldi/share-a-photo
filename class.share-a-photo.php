@@ -44,7 +44,8 @@ class Share_A_Photo {
             'nonce' => wp_create_nonce( 'shaph_upload' ),
             'pageEnclosure' => '#page',
             'processUpload' => '/?share_a_photo_upload=true',
-            'processPost' => '/?share_a_photo_finish=true'
+            'processPost' => '/?share_a_photo_finish=true',
+            'placeholderImage' => SHAPH_PATH . 'images/placeholder.png',
         );
 
         $extensions = $this->get_extensions();

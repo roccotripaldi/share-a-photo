@@ -2,7 +2,6 @@
 
 $editor_labels = array(
 	'title' => 'Describe Your Photo',
-	'placeholder_image' => SHAPH_PATH . 'images/placeholder.png',
 );
 $editor_labels = apply_filters( 'shaph_editor_labels', $editor_labels );
 
@@ -12,7 +11,7 @@ $editor_labels = apply_filters( 'shaph_editor_labels', $editor_labels );
 
 	<div id="shaph-image-editor">
 		<div id="shaph-image-preview">
-			<img id="shaph-image-placeholder" src="<?php echo esc_url( $editor_labels['placeholder_image'] ); ?>" />
+			<img id="shaph-image-placeholder" />
 			<p>Uploaded: <b id="shaph-image-percent">0%</b></p>
 		</div>
 

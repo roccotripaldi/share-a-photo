@@ -19,6 +19,8 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	uploader: false,
 	selectedFiles: [],
 	uploadedFiles: [],
+	currentImageId: false,
+	isUploading: false,
 
 	initialize: function() {
 		jQuery( '.shaph-button' ).click( this.open );
@@ -28,7 +30,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	initializePluploader: function() {
 		shareAPhoto.App.uploader = new plupload.Uploader({
-			browse_button: 'shaph-browse', // this can be an id of a DOM element or the DOM element itself
+			browse_button: 'shaph-browse',
 			url: shareAPhoto.processUpload,
 			filters: {
 				mime_types: [
@@ -41,10 +43,10 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		});
 		shareAPhoto.App.uploader.init();
 		shareAPhoto.App.uploader.bind( 'FilesAdded', shareAPhoto.App.pluploadHandlers.filesAdded );
-		//shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.uploadProgress );
-		//shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.fileUploaded );
+		shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.pluploadHandlers.uploadProgress );
+		shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.pluploadHandlers.fileUploaded );
 		//shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.uploadComplete );
-		//jQuery( '#shaph-modal' ).on( 'click', '#shaph-start-upload', shareAPhoto.App.startUpload );
+
 	},
 
 	pluploadHandlers: {
@@ -57,6 +59,24 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			});
 			shareAPhoto.App.renderTemplate( '#shaph-page', 'image-editor' );
 			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
+			shareAPhoto.App.isUploading = true;
+			shareAPhoto.App.currentImageId = shareAPhoto.App.selectedFiles[0].id;
+			shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
+			shareAPhoto.App.uploader.start();
+		},
+
+		uploadProgress: function(up, file) {
+			if ( file.id === shareAPhoto.App.currentImageId ) {
+				jQuery( '#shaph-image-percent' ).text( file.percent + '%' );
+			}
+		},
+
+		fileUploaded: function( up, file, response ) {
+			var responseObj = JSON.parse( response.response );
+			shareAPhoto.App.uploadedFiles.push( responseObj );
+			if ( file.id === shareAPhoto.App.currentImageId ) {
+				shareAPhoto.App.setPreviewImage( responseObj.url );
+			}
 		}
 	},
 
@@ -68,19 +88,12 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.uploader = false;
 		shareAPhoto.App.selectedFiles = [];
 		shareAPhoto.App.uploadedFiles = [];
-	},
-
-	startUpload: function() {
-		shareAPhoto.App.disableButtons();
-		shareAPhoto.App.uploader.start();
+		shareAPhoto.App.currentImageId = false;
+		shareAPhoto.App.isUploading = false;
 	},
 
 	uploadProgress: function(up, file) {
 		document.getElementById(file.id).getElementsByTagName( 'b' )[0].innerHTML = '<span>' + file.percent + "%</span>";
-	},
-
-	fileUploaded: function( up, file, response ) {
-		shareAPhoto.App.fileList.push( JSON.parse( response.response ) );
 	},
 
 	uploadComplete: function( up, files ) {
@@ -125,6 +138,11 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	renderTemplate: function( element, templateName ) {
 		var template = new shareAPhotoTemplate();
 		jQuery( element ).html( template.setTemplate( templateName ).render().el );
+		shareAPhoto.App.setContentHeight();
+	},
+
+	setPreviewImage: function( src ) {
+		jQuery( "#shaph-image-placeholder" ).attr( 'src', src );
 		shareAPhoto.App.setContentHeight();
 	},
 
