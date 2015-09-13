@@ -106,7 +106,22 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery( '.shaph-image-attribute' ).each( function() {
 			shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ][ jQuery( this ).attr( 'name' ) ] = jQuery( this ).val();
 		} );
-		console.log( shareAPhoto.App.uploadedFiles );
+
+		if ( shareAPhoto.App.currentImageIndex + 1 < shareAPhoto.App.selectedFiles.length ) {
+			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
+			shareAPhoto.App.currentImageIndex++;
+			shareAPhoto.App.currentImageId = shareAPhoto.App.selectedFiles[ shareAPhoto.App.currentImageIndex ].id;
+			if ( shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ] ) {
+				shareAPhoto.App.setPreviewImage( shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ].url );
+			} else {
+				shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
+			}
+			shareAPhoto.App.setActionButton();
+		} else if ( shareAPhoto.extensions.length ) {
+			console.log( 'extended' );
+		} else {
+			console.log( 'finish' );
+		}
 	},
 
 	finish: function() {
@@ -153,7 +168,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	setActionButton: function() {
-		
+
 		if ( shareAPhoto.App.isUploading ) {
 			jQuery( '#shaph-image-action' ).prop( 'disabled', true );
 		} else {
