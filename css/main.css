@@ -34,13 +34,6 @@
     box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
 }
 
-#shaph-page {
-    border: none;
-    outline: none;
-    padding: 10px;
-}
-
-
 .shaph-title {
     font-family: 'Open Sans', sans-serif;
     color: white;
@@ -61,6 +54,7 @@
     font-family: 'Open Sans', sans-serif;
     padding: 20px;
     font-size: 24px;
+    text-shadow: none;
 }
 
 #shaph-cancel {
@@ -74,48 +68,74 @@
     outline: none;
     font-family: "Open Sans", sans-serif;
     font-size: 18px;
+    text-shadow: none;
 }
 
-.shaph-uploaded-image {
-    padding: 10px 0;
-    border-bottom: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+#shaph-page p {
+    font-family: "Open Sans", sans-serif;
+    color: #95d4ff;
 }
 
-.shaph-uploaded-image img {
-    width: 15%;
-    height: auto;
-    border: 1px solid;
+#shaph-page p b {
+    color: #FFF;
 }
 
-.shaph-image-attributes {
-    width: 81%;
-}
-
-.shaph-image-attributes label {
+#shaph-page label {
     display: block;
+    color: white;
+    margin: 0 0 5px 0;
+    font-family: "Open Sans", sans-serif;
+}
+
+#shaph-page .text-input {
+    background-color: #286592;
+    padding: 5px;
+    width: 100%;
+    font-family: "Open Sans", sans-serif;
+    color: white;
+    border: none;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+#shaph-image-editor {
+    margin-bottom: 80px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+#shaph-image-preview {
+    width: 20%
+}
+
+#shaph-image-preview img {
+    width: 100%;
+}
+
+#shaph-image-attributes {
+    width: 77%;
 }
 
 .shaph-footer-buttons {
-    position: absolute;
     width: 100%;
-    padding: 10px 0;
-    background-color: #000000;
-    left: 0px;
-    bottom: 0px;
+    padding: 20px 0;
+    background-color: #EEE;
+    border-radius: 0 0 4px 4px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
-.shaph-footer-buttons input {
+#shaph .shaph-footer-buttons input {
     margin-left: 10px;
-    background-color: greenyellow !important;
-}
-
-.shaph-footer-buttons input:disabled {
-    opacity: 0.4;
-}
-
-.shaph-content {
-    overflow: scroll;
+    background: #3887bf;
+    box-shadow: none;
+    border: none;
+    outline: none;
+    color: #FFF;
+    font-family: 'Open Sans', sans-serif;
+    padding: 10px;
+    font-size: 16px;
+    text-shadow: none;
 }

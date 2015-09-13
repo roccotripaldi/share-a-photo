@@ -55,7 +55,8 @@ var shareAPhotoApp = Backbone.Model.extend( {
 					name : file.name
 				} );
 			});
-			console.log( shareAPhoto.App.selectedFiles );
+			shareAPhoto.App.renderTemplate( '#shaph-page', 'image-editor' );
+			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
 		}
 	},
 
@@ -117,13 +118,13 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	open: function() {
 		jQuery( '#shaph' ).addClass( 'open' );
-		shareAPhoto.App.renderBaseTemplate( 'uploader' );
+		shareAPhoto.App.renderTemplate( '#shaph-page', 'uploader' );
 		shareAPhoto.App.initializePluploader();
 	},
 
-	renderBaseTemplate: function( templateName ) {
+	renderTemplate: function( element, templateName ) {
 		var template = new shareAPhotoTemplate();
-		jQuery( '#shaph-page' ).html( template.setTemplate( templateName ).render().el );
+		jQuery( element ).html( template.setTemplate( templateName ).render().el );
 		shareAPhoto.App.setContentHeight();
 	},
 

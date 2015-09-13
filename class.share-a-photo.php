@@ -89,8 +89,8 @@ class Share_A_Photo {
         echo $this->print_template( 'modal', SHAPH_DIR . '/inc/template.modal.php' );
         echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/template.uploader.php' );
         echo $this->print_template( 'thank-you', SHAPH_DIR . '/inc/template.thank-you.php' );
-        echo $this->print_template( 'image-editor', SHAPH_DIR . 'inc/template.image-editor.php' );
-        echo $this->print_template( 'image-attributes', SHAPH_DIR . 'inc/template.image-attributes.php' );
+        echo $this->print_template( 'image-editor', SHAPH_DIR . '/inc/template.image-editor.php' );
+        echo $this->print_template( 'image-attributes', SHAPH_DIR . '/inc/template.image-attributes.php' );
 
         /**
          * Filter the list of optional templates
