@@ -117,20 +117,21 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	open: function() {
 		var fieldset = new shareAPhotoFieldset();
-		jQuery("#shaph-bg").addClass("open");
+		jQuery("#shaph").addClass("open");
 		jQuery("#shaph-page").html( fieldset.setTemplate( 'uploader' ).render().el );
 		shareAPhoto.App.initializePluploader();
+		shareAPhoto.App.setContentHeight();
 	},
 
 	setContentHeight: function() {
-		var h = jQuery( '#shaph-modal' ).height() - 130;
-		console.log( h )
-		jQuery( '.shaph-content' ).css( 'height', h );
+		var h = jQuery( '#shaph-modal' ).height() + 200;
+		jQuery( shareAPhoto.pageEnclosure ).css( { height: h, overflow: 'hidden' } );
 	},
 
 	close: function() {
-		jQuery("#shaph-bg").removeClass("open");
+		jQuery("#shaph").removeClass("open");
 		shareAPhoto.App.resetState();
+		jQuery( shareAPhoto.pageEnclosure ).css( { height: 'auto', overflow: 'auto' } );
 	},
 
 	disableButtons: function() {

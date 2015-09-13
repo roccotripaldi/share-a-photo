@@ -4,7 +4,8 @@ $cancel_button_text = 'Cancel';
 $cancel_button_text = apply_filters( 'shaph_cancel_button_text', $cancel_button_text );
 
 ?>
-<div id="shaph-bg">
+<div id="shaph">
+	<div id="shaph-bg"></div>
 	<div id="shaph-modal">
 
 		<div id="shaph-page"></div>
@@ -13,3 +14,4 @@ $cancel_button_text = apply_filters( 'shaph_cancel_button_text', $cancel_button_
 
 	</div>
 </div>
+
