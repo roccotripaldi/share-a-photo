@@ -46,10 +46,8 @@ class Share_A_Photo {
             'processPost' => '/?share_a_photo_finish=true'
         );
 
-        $templates = $this->get_templates();
-        if ( is_array( $templates ) ) {
-            $shaph_js_data['templates'] = array_keys( $templates );
-        }
+        $extensions = $this->get_extensions();
+        $shaph_js_data['extensions'] = array_keys( $extensions );
 
         $shaph_js_data = apply_filters( 'shaph-js-data', $shaph_js_data );
         wp_localize_script( 'shaph-js', 'shareAPhoto', $shaph_js_data );
@@ -69,7 +67,7 @@ class Share_A_Photo {
         $this->settings = $settings ? $settings : array();
         add_action( 'wp_footer', array( $this, 'print_javascripts' ) );
         ob_start();
-        include SHAPH_DIR . '/inc/button.php';
+        include SHAPH_DIR . '/inc/template.button.php';
         $button = ob_get_contents();
         ob_end_clean();
         return $button;
@@ -87,29 +85,27 @@ class Share_A_Photo {
     function print_templates() {
 
         // these templates are required for every instance of share-a-photo
-        echo $this->print_template( 'form-base', SHAPH_DIR . '/inc/form-base.php' );
-        echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/uploader.php' );
-        echo $this->print_template( 'thank-you', SHAPH_DIR . '/inc/thank-you.php' );
+        echo $this->print_template( 'modal', SHAPH_DIR . '/inc/template.modal.php' );
+        echo $this->print_template( 'uploader', SHAPH_DIR . '/inc/template.uploader.php' );
+        echo $this->print_template( 'thank-you', SHAPH_DIR . '/inc/template.thank-you.php' );
+        echo $this->print_template( 'image-editor', SHAPH_DIR . 'inc/template.image-editor.php' );
+        echo $this->print_template( 'image-attributes', SHAPH_DIR . 'inc/template.image-attributes.php' );
 
-        $templates = $this->get_templates();
+        /**
+         * Filter the list of optional templates
+         */
+        $extensions = $this->get_extensions();
 
-        if ( ! empty( $templates ) && is_array( $templates ) ) {
-            foreach( $templates as $name=>$file ) {
-                echo $this->print_template( $name, $file );
+        if ( ! empty( $extensions ) && is_array( $extensions ) ) {
+            foreach( $extensions as $name => $extension_file ) {
+                echo $this->print_template( $name, $extension_file );
             }
         }
 
     }
 
-    function get_templates() {
-        $templates = array(
-            'caption' => SHAPH_DIR . '/inc/caption.php',
-        );
-        /**
-         * Filter the list of optional templates
-         */
-        $templates = apply_filters( 'shaph-templates', $templates );
-        return $templates;
+    function get_extensions() {
+        return apply_filters( 'shaph-extension-pages', array() );
     }
 
     /**

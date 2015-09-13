@@ -15,15 +15,15 @@ var shareAPhotoFieldset = Backbone.View.extend( {
 });
 
 var shareAPhotoApp = Backbone.Model.extend( {
-	currentTemplate: false,
+	currentExtensionPage: false,
 	uploader: false,
-	fileList: [],
+	selectedFiles: [],
+	uploadedFiles: [],
 
 	initialize: function() {
 		jQuery(".shaph-button").click( this.open );
 		jQuery("#shaph-cancel").click( this.close );
-		jQuery( '#shaph-form' ).on( 'click', '#shaph-finish', this.finish );
-		jQuery( document ).resize( this.setContentHeight );
+		jQuery( '#shaph-modal' ).on( 'click', '#shaph-finish', this.finish );
 	},
 
 	initializePluploader: function() {
@@ -40,25 +40,38 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			}
 		});
 		shareAPhoto.App.uploader.init();
-		shareAPhoto.App.uploader.bind( 'FilesAdded', shareAPhoto.App.filesAdded );
-		shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.uploadProgress );
-		shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.fileUploaded );
-		shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.uploadComplete );
-		jQuery( '#shaph-form' ).on( 'click', '#shaph-start-upload', shareAPhoto.App.startUpload );
+		shareAPhoto.App.uploader.bind( 'FilesAdded', shareAPhoto.App.pluploadHandlers.filesAdded );
+		//shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.uploadProgress );
+		//shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.fileUploaded );
+		//shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.uploadComplete );
+		//jQuery( '#shaph-modal' ).on( 'click', '#shaph-start-upload', shareAPhoto.App.startUpload );
+	},
+
+	pluploadHandlers: {
+		filesAdded: function( up, files ) {
+			plupload.each( files, function( file ) {
+				shareAPhoto.App.selectedFiles.push( {
+					id : file.id,
+					name : file.name
+				} );
+			});
+			console.log( shareAPhoto.App.selectedFiles );
+		}
+	},
+
+	resetState: function() {
+		if ( shareAPhoto.App.uploader ) {
+			shareAPhoto.App.uploader.destroy();
+		}
+		shareAPhoto.App.currentExtensionPage = false;
+		shareAPhoto.App.uploader = false;
+		shareAPhoto.App.selectedFiles = [];
+		shareAPhoto.App.uploadedFiles = [];
 	},
 
 	startUpload: function() {
 		shareAPhoto.App.disableButtons();
 		shareAPhoto.App.uploader.start();
-	},
-
-	filesAdded: function( up, files ) {
-		var html = '';
-		plupload.each(files, function(file) {
-			html += '<li id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></li>';
-		});
-		jQuery('#shaph-filelist').html( html );
-		shareAPhoto.App.setContentHeight();
 	},
 
 	uploadProgress: function(up, file) {
@@ -71,8 +84,8 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	uploadComplete: function( up, files ) {
 		var fieldset = new shareAPhotoFieldset();
-		shareAPhoto.App.currentTemplate = shareAPhoto.templates[0];
-		jQuery("#shaph-fieldset").html( fieldset.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
+		shareAPhoto.App.currentTemplate = shareAPhoto.extensions[0];
+		jQuery("#shaph-page").html( fieldset.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
 		shareAPhoto.App.setContentHeight();
 	},
 
@@ -96,40 +109,28 @@ var shareAPhotoApp = Backbone.Model.extend( {
 				var fieldset = new shareAPhotoFieldset();
 				shareAPhoto.App.currentTemplate = false;
 				shareAPhoto.App.fileList = [];
-				jQuery("#shaph-fieldset").html( fieldset.setTemplate( 'thank-you' ).render( response ).el );
+				jQuery("#shaph-page").html( fieldset.setTemplate( 'thank-you' ).render( response ).el );
 			},
 			'json'
 		);
 	},
 
 	open: function() {
-		var fieldset = new shareAPhotoFieldset(),
-			template = 'uploader';
+		var fieldset = new shareAPhotoFieldset();
 		jQuery("#shaph-bg").addClass("open");
-
-		if ( shareAPhoto.App.currentTemplate && _.indexOf( shareAPhoto.templates, shareAPhoto.App.currentTemplate ) >= 0 ) {
-			template = shareAPhoto.App.currentTemplate;
-		}
-
-		jQuery("#shaph-fieldset").html( fieldset.setTemplate(template).render().el );
-
-		if ( ! shareAPhoto.App.uploader && ! shareAPhoto.App.currentTemplate ) {
-			shareAPhoto.App.initializePluploader();
-		}
+		jQuery("#shaph-page").html( fieldset.setTemplate( 'uploader' ).render().el );
+		shareAPhoto.App.initializePluploader();
 	},
 
 	setContentHeight: function() {
-		var h = jQuery( '#shaph-form' ).height() - 130;
+		var h = jQuery( '#shaph-modal' ).height() - 130;
 		console.log( h )
 		jQuery( '.shaph-content' ).css( 'height', h );
 	},
 
 	close: function() {
 		jQuery("#shaph-bg").removeClass("open");
-		if ( shareAPhoto.App.uploader ) {
-			shareAPhoto.App.uploader.destroy();
-			shareAPhoto.App.uploader = false;
-		}
+		shareAPhoto.App.resetState();
 	},
 
 	disableButtons: function() {
