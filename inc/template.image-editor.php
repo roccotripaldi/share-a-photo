@@ -21,7 +21,6 @@ $editor_labels = apply_filters( 'shaph_editor_labels', $editor_labels );
 	</div>
 
 	<div class="shaph-footer-buttons">
-		<input type="button" id="shaph-next-image" value="Next Image" />
-		<input type="button" id="shaph-finish" value="Finish" />
+		<input type="button" id="shaph-image-action" />
 	</div>
 </script>

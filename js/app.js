@@ -18,14 +18,15 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	currentExtensionPage: false,
 	uploader: false,
 	selectedFiles: [],
-	uploadedFiles: [],
+	uploadedFiles: {},
 	currentImageId: false,
+	currentImageIndex: false,
 	isUploading: false,
 
 	initialize: function() {
 		jQuery( '.shaph-button' ).click( this.open );
 		jQuery( '#shaph-cancel' ).click( this.close );
-		jQuery( '#shaph-modal' ).on( 'click', '#shaph-finish', this.finish );
+		jQuery( '#shaph-modal' ).on( 'click', '#shaph-image-action', this.imageAction );
 	},
 
 	initializePluploader: function() {
@@ -45,7 +46,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.uploader.bind( 'FilesAdded', shareAPhoto.App.pluploadHandlers.filesAdded );
 		shareAPhoto.App.uploader.bind( 'UploadProgress', shareAPhoto.App.pluploadHandlers.uploadProgress );
 		shareAPhoto.App.uploader.bind( 'FileUploaded', shareAPhoto.App.pluploadHandlers.fileUploaded );
-		//shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.uploadComplete );
+		shareAPhoto.App.uploader.bind( 'UploadComplete', shareAPhoto.App.pluploadHandlers.uploadComplete );
 
 	},
 
@@ -61,7 +62,9 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
 			shareAPhoto.App.isUploading = true;
 			shareAPhoto.App.currentImageId = shareAPhoto.App.selectedFiles[0].id;
+			shareAPhoto.App.currentImageIndex = 0;
 			shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
+			shareAPhoto.App.setActionButton();
 			shareAPhoto.App.uploader.start();
 		},
 
@@ -73,10 +76,16 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 		fileUploaded: function( up, file, response ) {
 			var responseObj = JSON.parse( response.response );
-			shareAPhoto.App.uploadedFiles.push( responseObj );
+			shareAPhoto.App.uploadedFiles[ file.id ] = responseObj;
+			console.log(shareAPhoto.App.uploadedFiles);
 			if ( file.id === shareAPhoto.App.currentImageId ) {
 				shareAPhoto.App.setPreviewImage( responseObj.url );
 			}
+		},
+
+		uploadComplete: function( up, files ) {
+			shareAPhoto.App.isUploading = false;
+			shareAPhoto.App.setActionButton();
 		}
 	},
 
@@ -87,20 +96,17 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.currentExtensionPage = false;
 		shareAPhoto.App.uploader = false;
 		shareAPhoto.App.selectedFiles = [];
-		shareAPhoto.App.uploadedFiles = [];
+		shareAPhoto.App.uploadedFiles = {};
 		shareAPhoto.App.currentImageId = false;
+		shareAPhoto.App.currentImageIndex = false;
 		shareAPhoto.App.isUploading = false;
 	},
 
-	uploadProgress: function(up, file) {
-		document.getElementById(file.id).getElementsByTagName( 'b' )[0].innerHTML = '<span>' + file.percent + "%</span>";
-	},
-
-	uploadComplete: function( up, files ) {
-		var template = new shareAPhotoTemplate();
-		shareAPhoto.App.currentTemplate = shareAPhoto.extensions[0];
-		jQuery( '#shaph-page' ).html( template.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
-		shareAPhoto.App.setContentHeight();
+	imageAction: function() {
+		jQuery( '.shaph-image-attribute' ).each( function() {
+			shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ][ jQuery( this ).attr( 'name' ) ] = jQuery( this ).val();
+		} );
+		console.log( shareAPhoto.App.uploadedFiles );
 	},
 
 	finish: function() {
@@ -144,6 +150,23 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	setPreviewImage: function( src ) {
 		jQuery( "#shaph-image-placeholder" ).attr( 'src', src );
 		shareAPhoto.App.setContentHeight();
+	},
+
+	setActionButton: function() {
+		
+		if ( shareAPhoto.App.isUploading ) {
+			jQuery( '#shaph-image-action' ).prop( 'disabled', true );
+		} else {
+			jQuery( '#shaph-image-action' ).prop( 'disabled', false );
+		}
+
+		if ( shareAPhoto.App.currentImageIndex + 1 < shareAPhoto.App.selectedFiles.length ) {
+			jQuery( '#shaph-image-action' ).attr( 'value', 'Next Photo' ).prop( 'disabled', false );
+		} else if ( shareAPhoto.extensions.length ) {
+			jQuery( '#shaph-image-action' ).attr( 'value', 'Next' );
+		} else {
+			jQuery( '#shaph-image-action' ).attr( 'value', 'Finish' );
+		}
 	},
 
 	setContentHeight: function() {
