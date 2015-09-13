@@ -2,10 +2,10 @@
 
 var shaphAPhotoUploader = false;
 
-var shareAPhotoFieldset = Backbone.View.extend( {
+var shareAPhotoTemplate = Backbone.View.extend( {
 	tagName: 'div',
 	setTemplate: function( template ) {
-		this.template = _.template( jQuery('#shaph-template-' + template).html() );
+		this.template = _.template( jQuery( '#shaph-template-' + template ).html() );
 		return this;
 	},
 	render: function( data ) {
@@ -21,8 +21,8 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	uploadedFiles: [],
 
 	initialize: function() {
-		jQuery(".shaph-button").click( this.open );
-		jQuery("#shaph-cancel").click( this.close );
+		jQuery( '.shaph-button' ).click( this.open );
+		jQuery( '#shaph-cancel' ).click( this.close );
 		jQuery( '#shaph-modal' ).on( 'click', '#shaph-finish', this.finish );
 	},
 
@@ -75,7 +75,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	uploadProgress: function(up, file) {
-		document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+		document.getElementById(file.id).getElementsByTagName( 'b' )[0].innerHTML = '<span>' + file.percent + "%</span>";
 	},
 
 	fileUploaded: function( up, file, response ) {
@@ -83,19 +83,19 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	uploadComplete: function( up, files ) {
-		var fieldset = new shareAPhotoFieldset();
+		var template = new shareAPhotoTemplate();
 		shareAPhoto.App.currentTemplate = shareAPhoto.extensions[0];
-		jQuery("#shaph-page").html( fieldset.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
+		jQuery( '#shaph-page' ).html( template.setTemplate( shareAPhoto.App.currentTemplate ).render( { files: shareAPhoto.App.fileList } ).el );
 		shareAPhoto.App.setContentHeight();
 	},
 
 	finish: function() {
 		shareAPhoto.App.disableButtons();
-		jQuery('.shaph-image-title').each( function( index, value ) {
+		jQuery( '.shaph-image-title' ).each( function( index, value ) {
 			shareAPhoto.App.fileList[ index ].title = jQuery( value ).val();
 		} );
 
-		jQuery('.shaph-image-caption').each( function( index, value ) {
+		jQuery( '.shaph-image-caption' ).each( function( index, value ) {
 			shareAPhoto.App.fileList[ index ].caption = jQuery( value ).val();
 		} );
 
@@ -106,20 +106,24 @@ var shareAPhotoApp = Backbone.Model.extend( {
 				nonce: shareAPhoto.nonce
 			},
 			function( response) {
-				var fieldset = new shareAPhotoFieldset();
+				var template = new shareAPhotoTemplate();
 				shareAPhoto.App.currentTemplate = false;
 				shareAPhoto.App.fileList = [];
-				jQuery("#shaph-page").html( fieldset.setTemplate( 'thank-you' ).render( response ).el );
+				jQuery( '#shaph-page' ).html( template.setTemplate( 'thank-you' ).render( response ).el );
 			},
 			'json'
 		);
 	},
 
 	open: function() {
-		var fieldset = new shareAPhotoFieldset();
-		jQuery("#shaph").addClass("open");
-		jQuery("#shaph-page").html( fieldset.setTemplate( 'uploader' ).render().el );
+		jQuery( '#shaph' ).addClass( 'open' );
+		shareAPhoto.App.renderBaseTemplate( 'uploader' );
 		shareAPhoto.App.initializePluploader();
+	},
+
+	renderBaseTemplate: function( templateName ) {
+		var template = new shareAPhotoTemplate();
+		jQuery( '#shaph-page' ).html( template.setTemplate( templateName ).render().el );
 		shareAPhoto.App.setContentHeight();
 	},
 
@@ -129,7 +133,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	close: function() {
-		jQuery("#shaph").removeClass("open");
+		jQuery( '#shaph' ).removeClass( 'open' );
 		shareAPhoto.App.resetState();
 		jQuery( shareAPhoto.pageEnclosure ).css( { height: 'auto', overflow: 'auto' } );
 	},
