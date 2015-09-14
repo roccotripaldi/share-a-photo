@@ -118,33 +118,23 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			}
 			shareAPhoto.App.setActionButton();
 		} else if ( shareAPhoto.extensions.length ) {
-			console.log( 'extended' );
+			shareAPhoto.App.renderTemplate( '#shaph-page', shareAPhoto.App.extensions[0].name );
 		} else {
-			console.log( 'finish' );
+			shareAPhoto.App.finish();
 		}
 	},
 
 	finish: function() {
-		shareAPhoto.App.disableButtons();
-		jQuery( '.shaph-image-title' ).each( function( index, value ) {
-			shareAPhoto.App.fileList[ index ].title = jQuery( value ).val();
-		} );
-
-		jQuery( '.shaph-image-caption' ).each( function( index, value ) {
-			shareAPhoto.App.fileList[ index ].caption = jQuery( value ).val();
-		} );
-
+		var files = _.values( shareAPhoto.App.uploadedFiles );
+		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
 		jQuery.post(
 			shareAPhoto.processPost,
 			{
-				files: shareAPhoto.App.fileList,
+				files: files,
 				nonce: shareAPhoto.nonce
 			},
-			function( response) {
-				var template = new shareAPhotoTemplate();
-				shareAPhoto.App.currentTemplate = false;
-				shareAPhoto.App.fileList = [];
-				jQuery( '#shaph-page' ).html( template.setTemplate( 'thank-you' ).render( response ).el );
+			function( response ) {
+				shareAPhoto.App.renderTemplate( '#shaph-page', 'thank-you', response );
 			},
 			'json'
 		);
@@ -156,9 +146,9 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.initializePluploader();
 	},
 
-	renderTemplate: function( element, templateName ) {
+	renderTemplate: function( element, templateName, data ) {
 		var template = new shareAPhotoTemplate();
-		jQuery( element ).html( template.setTemplate( templateName ).render().el );
+		jQuery( element ).html( template.setTemplate( templateName ).render( data ).el );
 		shareAPhoto.App.setContentHeight();
 	},
 
@@ -193,10 +183,6 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery( '#shaph' ).removeClass( 'open' );
 		shareAPhoto.App.resetState();
 		jQuery( shareAPhoto.pageEnclosure ).css( { height: 'auto', overflow: 'auto' } );
-	},
-
-	disableButtons: function() {
-		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
 	}
 
 } );
