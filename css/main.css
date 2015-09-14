@@ -40,7 +40,14 @@
     font-weight: bold;
     text-align: center;
     text-transform: uppercase;
-    font-size: 30px;
+    font-size: 24px;
+    margin: 30px 0;
+}
+
+@media (min-width: 750px) {
+    .shaph-title {
+        font-size: 30px !important;
+    }
 }
 
 #shaph-browse {
@@ -67,8 +74,14 @@
     box-shadow: none;
     outline: none;
     font-family: "Open Sans", sans-serif;
-    font-size: 18px;
+    font-size: 14px;
     text-shadow: none;
+}
+
+@media (min-width: 750px) {
+    #shaph-cancel {
+        font-size: 18px !important;
+    }
 }
 
 #shaph-page p {
@@ -100,21 +113,36 @@
 
 #shaph-image-editor {
     margin-bottom: 80px;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
+    padding: 0 20px;
 }
 
 #shaph-image-preview {
-    width: 20%
+    width: 100%
 }
 
 #shaph-image-preview img {
-    width: 100%;
+    width: 98%;
+    border: 1px solid white;
 }
 
 #shaph-image-attributes {
-    width: 77%;
+    width: 100%;
+}
+
+@media (min-width: 750px) {
+    #shaph-image-editor {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        padding: 0;
+    }
+    #shaph-image-attributes {
+        width: 75%;
+    }
+
+    #shaph-image-preview {
+        width: 20%
+    }
 }
 
 .shaph-footer-buttons {
