@@ -140,6 +140,7 @@ class Share_A_Photo {
         $uploadedfile = $_FILES['file'];
         $upload_overrides = array( 'test_form' => false );
         $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+        $movefile['nonce'] = wp_create_nonce( 'shaph_' . basename( $movefile['file'] ) );
         echo json_encode( $movefile );
         exit;
     }
@@ -148,13 +149,24 @@ class Share_A_Photo {
         if ( ! wp_verify_nonce( $_POST['nonce'], 'shaph_upload' ) ) {
             die( json_encode( 'Unauthorized' ) );
         }
+
+        if ( ! is_array( $_POST['files'] ) ) {
+            die( json_encode( 'Unauthorized' ) );
+        }
+
         global $current_user;
         require_once( ABSPATH . 'wp-admin/includes/image.php' );
         $post_author = is_user_logged_in() ? $current_user->ID : get_option( 'shaph_anonymous_user' );
         $post_status = is_user_logged_in() ? 'publish' : 'pending';
-        $message = is_user_logged_in() ? 'Thanks for sharing!' : 'Thanks for sharing! Your post will be published pending moderation.';
+        $message = is_user_logged_in() ? 'Your photo is now published!' : 'Your photo is in our inbox! It will be published as soon as it is reviewed.';
 
         foreach( $_POST['files'] as $image ) {
+            $filename = $image['file'];
+
+            if ( ! wp_verify_nonce( $image['nonce'], 'shaph_' . basename( $filename ) ) ) {
+                continue;
+            }
+
             $pre_post_options = array(
                 'post_title' => $image['title'],
                 'post_status' => $post_status,
@@ -163,7 +175,6 @@ class Share_A_Photo {
             $pre_post_options = apply_filters( 'shaph_pre_post', $pre_post_options, $image );
             $post_id = wp_insert_post( $pre_post_options );
 
-            $filename = $image['file'];
             $filetype = wp_check_filetype( basename( $filename ), null );
             $wp_upload_dir = wp_upload_dir();
 

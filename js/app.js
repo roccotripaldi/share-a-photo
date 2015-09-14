@@ -77,7 +77,6 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		fileUploaded: function( up, file, response ) {
 			var responseObj = JSON.parse( response.response );
 			shareAPhoto.App.uploadedFiles[ file.id ] = responseObj;
-			console.log(shareAPhoto.App.uploadedFiles);
 			if ( file.id === shareAPhoto.App.currentImageId ) {
 				shareAPhoto.App.setPreviewImage( responseObj.url );
 			}
@@ -135,6 +134,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			},
 			function( response ) {
 				shareAPhoto.App.renderTemplate( '#shaph-page', 'thank-you', response );
+				jQuery( '#shaph-cancel' ).attr( 'value', 'Close' );
 			},
 			'json'
 		);
