@@ -175,14 +175,15 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	setContentHeight: function() {
-		var h = jQuery( '#shaph-modal' ).height() + 200;
-		jQuery( shareAPhoto.pageEnclosure ).css( { height: h, overflow: 'hidden' } );
+		var modalHeight = jQuery( '#shaph-modal' ).height() + 200,
+			windowHeight = jQuery( window ).height();
+		jQuery( shareAPhoto.pageEnclosure ).css( { height: Math.max( modalHeight, windowHeight ), overflow: 'hidden', position: 'fixed' } );
 	},
 
 	close: function() {
 		jQuery( '#shaph' ).removeClass( 'open' );
 		shareAPhoto.App.resetState();
-		jQuery( shareAPhoto.pageEnclosure ).css( { height: 'auto', overflow: 'auto' } );
+		jQuery( shareAPhoto.pageEnclosure ).css( { height: 'auto', overflow: 'auto', position: 'static' } );
 	}
 
 } );
