@@ -10,6 +10,10 @@ $cancel_button_text = apply_filters( 'shaph_cancel_button_text', $cancel_button_
 
 		<div id="shaph-page"></div>
 
+		<div class="shaph-footer-buttons">
+			<input type="button" id="shaph-image-action" />
+		</div>
+
 		<input type="button" id="shaph-cancel" value="<?php echo $cancel_button_text; ?>" />
 
 	</div>

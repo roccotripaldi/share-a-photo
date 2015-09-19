@@ -20,7 +20,4 @@ $editor_labels = apply_filters( 'shaph_editor_labels', $editor_labels );
 		</div>
 	</div>
 
-	<div class="shaph-footer-buttons">
-		<input type="button" id="shaph-image-action" />
-	</div>
 </script>

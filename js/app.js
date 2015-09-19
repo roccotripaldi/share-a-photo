@@ -15,7 +15,7 @@ var shareAPhotoTemplate = Backbone.View.extend( {
 });
 
 var shareAPhotoApp = Backbone.Model.extend( {
-	currentExtensionPage: false,
+	currentExtensionIndex: false,
 	uploader: false,
 	fileList: [],
 	currentImageIndex: false,
@@ -90,7 +90,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		if ( shareAPhoto.App.uploader ) {
 			shareAPhoto.App.uploader.destroy();
 		}
-		shareAPhoto.App.currentExtensionPage = false;
+		shareAPhoto.App.currentExtensionIndex = false;
 		shareAPhoto.App.uploader = false;
 		shareAPhoto.App.fileList = [];
 		shareAPhoto.App.currentImageIndex = false;
@@ -143,8 +143,18 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	renderTemplate: function( element, templateName, data ) {
-		var template = new shareAPhotoTemplate();
-		jQuery( element ).html( template.setTemplate( templateName ).render( data ).el );
+		var template = new shareAPhotoTemplate(),
+			defaultData = {
+				files: shareAPhoto.App.fileList,
+				currentImageIndex: shareAPhoto.App.currentImageIndex,
+				isUploading: shareAPhoto.App.isUploading,
+				numExtensions: shareAPhoto.extensions.length,
+				currentExtensionIndex: shareAPhoto.App.currentExtensionIndex
+			},
+			templateData;
+		data = data || {};
+		templateData = _.extend( defaultData, data );
+		jQuery( element ).html( template.setTemplate( templateName ).render( templateData ).el );
 		shareAPhoto.App.setContentHeight();
 	},
 
