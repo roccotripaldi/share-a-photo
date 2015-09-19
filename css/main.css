@@ -180,6 +180,11 @@
     padding: 10px;
     font-size: 16px;
     text-shadow: none;
+    cursor: pointer;
+}
+
+#shaph .shaph-footer-buttons input:hover {
+    background: #286592;
 }
 
 #shaph .shaph-footer-buttons input:disabled {
