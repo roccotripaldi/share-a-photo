@@ -156,7 +156,8 @@ class Share_A_Photo {
 
         global $current_user;
         require_once( ABSPATH . 'wp-admin/includes/image.php' );
-        $post_author = is_user_logged_in() ? $current_user->ID : get_option( 'shaph_anonymous_user' );
+        $post_author_id = is_user_logged_in() ? $current_user->ID : get_option( 'shaph_anonymous_user' );
+        $post_author = get_user_by( 'id', $post_author_id );
         $post_status = is_user_logged_in() ? 'publish' : 'pending';
         $message = is_user_logged_in() ? 'Your photo is now published!' : 'Your photo is in our inbox! It will be published as soon as it is reviewed.';
 
@@ -167,10 +168,12 @@ class Share_A_Photo {
                 continue;
             }
 
+            $post_title = empty( $image['title'] ) ? 'Photo by ' . $post_author->data->display_name : $image['title'];
+
             $pre_post_options = array(
-                'post_title' => $image['title'],
+                'post_title' => $post_title,
                 'post_status' => $post_status,
-                'post_author' => $post_author,
+                'post_author' => $post_author_id,
             );
             $pre_post_options = apply_filters( 'shaph_pre_post', $pre_post_options, $image );
             $post_id = wp_insert_post( $pre_post_options );
