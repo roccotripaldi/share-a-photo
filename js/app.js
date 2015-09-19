@@ -79,7 +79,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			var responseObj = JSON.parse( response.response );
 			shareAPhoto.App.uploadedFiles[ file.id ] = responseObj;
 			if ( file.id === shareAPhoto.App.currentImageId ) {
-				shareAPhoto.App.setPreviewImage( responseObj.url );
+				shareAPhoto.App.setPreviewImage( responseObj.thumb );
 			}
 		},
 
@@ -113,7 +113,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.App.currentImageIndex++;
 			shareAPhoto.App.currentImageId = shareAPhoto.App.selectedFiles[ shareAPhoto.App.currentImageIndex ].id;
 			if ( shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ] ) {
-				shareAPhoto.App.setPreviewImage( shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ].url );
+				shareAPhoto.App.setPreviewImage( shareAPhoto.App.uploadedFiles[ shareAPhoto.App.currentImageId ].thumb );
 			} else {
 				shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
 			}

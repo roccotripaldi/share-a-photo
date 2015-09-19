@@ -133,15 +133,37 @@ class Share_A_Photo {
             die( json_encode( 'Unauthorized' ) );
         }
 
-        if ( ! function_exists( 'wp_handle_upload' ) ) {
-            require_once( ABSPATH . 'wp-admin/includes/file.php' );
-        }
+        require_once( ABSPATH . 'wp-admin/includes/file.php' );
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
         $uploadedfile = $_FILES['file'];
         $upload_overrides = array( 'test_form' => false );
         $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
-        $movefile['nonce'] = wp_create_nonce( 'shaph_' . basename( $movefile['file'] ) );
-        echo json_encode( $movefile );
+
+        $filename = $movefile['file'];
+        $filetype = wp_check_filetype( basename( $filename ), null );
+        $wp_upload_dir = wp_upload_dir();
+
+        $attachment_options = array(
+            'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
+            'post_mime_type' => $filetype['type'],
+            'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+            'post_content'   => '',
+            'post_status'    => 'inherit',
+        );
+
+        $attach_id = wp_insert_attachment( $attachment_options, $filename );
+        $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+        wp_update_attachment_metadata( $attach_id, $attach_data );
+        $attachment_thumb = wp_get_attachment_image_src( $attach_id, 'thumbnail' );
+
+        $response = array(
+            'attachment_id' => $attach_id,
+            'thumb' => $attachment_thumb[0],
+            'nonce' => wp_create_nonce( 'shaph_attachment_' . $attach_id ),
+        );
+
+        echo json_encode( $response );
         exit;
     }
 
@@ -155,54 +177,60 @@ class Share_A_Photo {
         }
 
         global $current_user;
-        require_once( ABSPATH . 'wp-admin/includes/image.php' );
-        $post_author_id = is_user_logged_in() ? $current_user->ID : get_option( 'shaph_anonymous_user' );
-        $post_author = get_user_by( 'id', $post_author_id );
-        $post_status = is_user_logged_in() ? 'publish' : 'pending';
-        $message = is_user_logged_in() ? 'Your photo is now published!' : 'Your photo is in our inbox! It will be published as soon as it is reviewed.';
+        $num_photos = 0;
+
+        if ( is_user_logged_in() ) {
+            $post_author_id = $current_user->ID;
+            $post_author = $current_user;
+            $post_status = 'publish';
+        } else {
+            $post_author_id = get_option( 'shaph_anonymous_user' );
+            $post_author = get_user_by( 'id', $post_author_id );
+            $post_status = 'pending';
+        }
 
         foreach( $_POST['files'] as $image ) {
-            $filename = $image['file'];
-
-            if ( ! wp_verify_nonce( $image['nonce'], 'shaph_' . basename( $filename ) ) ) {
+            if ( ! isset( $image['attachment_id'] ) ) {
                 continue;
             }
 
-            $post_title = empty( $image['title'] ) ? 'Photo by ' . $post_author->data->display_name : $image['title'];
+            $attachment_id = $image['attachment_id'];
 
-            $pre_post_options = array(
+            if ( ! wp_verify_nonce( $image['nonce'], 'shaph_attachment_' . $attachment_id ) ) {
+                continue;
+            }
+
+            $attachment_large = wp_get_attachment_image_src( $attachment_id, 'large' );
+            $attachment_full = wp_get_attachment_image_src( $attachment_id, 'full' );
+
+            $post_title = empty( $image['title'] ) ? 'Photo by ' . $post_author->data->display_name : $image['title'];
+            $post_content = '<a href="' . esc_url( $attachment_full[0] ) . '">';
+            $post_content .= '<img class="wp-image-' . $attachment_id . ' size-large" src="' . esc_url( $attachment_large[0] ) . '" alt="' . esc_attr( $post_title ) . '" width="' . $attachment_large[1] . '" height="' . $attachment_large[2] . '" /></a>';
+            if( ! empty( $image['caption'] ) ) {
+                $post_content = '[caption id="attachment_' . $attachment_id . '" align="alignnon" width="' . $attachment_large[1] . '"]' . $post_content . ' ' . $image['caption'] . '[/caption]';
+            }
+
+            $post_options = array(
                 'post_title' => $post_title,
                 'post_status' => $post_status,
                 'post_author' => $post_author_id,
+                'post_content' => $post_content,
             );
-            $pre_post_options = apply_filters( 'shaph_pre_post', $pre_post_options, $image );
-            $post_id = wp_insert_post( $pre_post_options );
 
-            $filetype = wp_check_filetype( basename( $filename ), null );
-            $wp_upload_dir = wp_upload_dir();
+            $post_options = apply_filters( 'shaph_pre_post', $post_options, $image );
+            $post_id = wp_insert_post( $post_options );
+            $num_photos++;
+        }
 
-            $attachment_options = array(
-                'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
-                'post_mime_type' => $filetype['type'],
-                'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
-                'post_content'   => '',
-                'post_excerpt'   => $image['caption'],
-                'post_status'    => 'inherit'
-            );
-            $attachment_options = apply_filters( 'shaph_pre_attachment', $attachment_options );
-            $attach_id = wp_insert_attachment( $attachment_options, $filename, $post_id );
-            $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-            $attach_data['image_meta']['caption'] = $image['caption'];
-            $attach_data = apply_filters( 'shaph_attachment_data', $attach_data, $attach_id, $image );
-            wp_update_attachment_metadata( $attach_id, $attach_data );
-            $post_content = '<a href="' . esc_url( $image['url'] ) . '">';
-            $post_content .= '<img class="wp-image-' . $attach_id . ' size-full" src="' . esc_url( $image['url'] ) . '" alt="' . esc_attr( $image['title'] ) . '" width="' . $attach_data['width'] . '" height="' . $attach_data['height'] . '" /></a>';
-            if( ! empty( $image['caption'] ) ) {
-                $post_content = '[caption id="attachment_' . $attach_id . '" align="alignnon" width="' . $attach_data['width'] . '"]' . $post_content . ' ' . $image['caption'] . '[/caption]';
-            }
-            $post_content = apply_filters( 'shaph_post_content', $post_content, $post_id, $attach_id );
-            wp_update_post( array( 'ID' => $post_id, 'post_content' => $post_content ) );
-            do_action( 'shaph_post_created', $post_id, $attach_id );
+        if ( is_user_logged_in() ) {
+            $message = sprintf( _n( '%s photo was published!', '%s photos were published', $num_photos ), $num_photos);
+        } else {
+            $message = sprintf(
+                _n(
+                    '%s photo is now in our inbox. It will be published pending review.',
+                    '%s photos are now in our inbox. They will be published pending review.',
+                    $num_photos
+                ), $num_photos );
         }
 
         echo json_encode( array( 'message' => $message ) );
