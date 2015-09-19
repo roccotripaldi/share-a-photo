@@ -147,7 +147,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		} else {
 			shareAPhoto.App.setExtensionData();
 		}
-		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
+		jQuery( '#shaph-footer-buttons input' ).prop( 'disabled', true );
 		shareAPhoto.App.currentExtensionIndex = false;
 		shareAPhoto.App.currentImageIndex = false;
 		jQuery.post(
@@ -175,7 +175,6 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 	renderImage: function( index ) {
 		shareAPhoto.App.currentImageIndex = index;
-		console.log( shareAPhoto.App.currentImageIndex );
 		shareAPhoto.App.renderTemplate( '#shaph-page', 'image-editor' );
 		shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
 		shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
