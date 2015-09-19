@@ -219,6 +219,19 @@ class Share_A_Photo {
 
             $post_options = apply_filters( 'shaph_pre_post', $post_options, $image );
             $post_id = wp_insert_post( $post_options );
+
+            $attachment_options = array(
+                'ID' => $attachment_id,
+                'post_author' => $post_author_id,
+                'post_parent' => $post_id
+            );
+
+            if( ! empty( $image['caption'] ) ) {
+                $attachment_options['post_excerpt'] = $image['caption'];
+            }
+
+            wp_update_post( $attachment_options );
+
             $num_photos++;
         }
 
