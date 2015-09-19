@@ -11,12 +11,9 @@ $editor_labels = apply_filters( 'shaph_editor_labels', $editor_labels );
 
 	<div id="shaph-image-editor">
 		<div id="shaph-image-preview">
-			<img id="shaph-image-placeholder" />
-			<p>Uploaded: <b id="shaph-image-percent">0%</b></p>
 		</div>
 
 		<div id="shaph-image-attributes">
-
 		</div>
 	</div>
 

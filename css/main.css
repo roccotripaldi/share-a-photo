@@ -63,6 +63,7 @@
     font-size: 24px;
     text-shadow: none;
     cursor: pointer;
+    border-radius: 8px;
 }
 
 #shaph-browse:hover {
@@ -159,7 +160,7 @@
     }
 }
 
-.shaph-footer-buttons {
+#shaph-footer-buttons {
     width: 100%;
     padding: 20px 0;
     background-color: #EEE;
@@ -169,7 +170,7 @@
     left: 0;
 }
 
-#shaph .shaph-footer-buttons input {
+#shaph-footer-buttons input {
     margin-left: 10px;
     background: #3887bf;
     box-shadow: none;
@@ -181,12 +182,13 @@
     font-size: 16px;
     text-shadow: none;
     cursor: pointer;
+    border-radius: 4px;
 }
 
-#shaph .shaph-footer-buttons input:hover {
+#shaph-footer-buttons input:hover {
     background: #286592;
 }
 
-#shaph .shaph-footer-buttons input:disabled {
+#shaph-footer-buttons input:disabled {
     opacity: 0.3;
 }

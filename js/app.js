@@ -18,6 +18,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	currentExtensionIndex: false,
 	uploader: false,
 	fileList: [],
+	extensionData: {},
 	currentImageIndex: false,
 	isUploading: false,
 	scrollY: 0,
@@ -25,7 +26,11 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	initialize: function() {
 		jQuery( '.shaph-button' ).click( this.open );
 		jQuery( '#shaph-cancel' ).click( this.close );
-		jQuery( '#shaph-modal' ).on( 'click', '#shaph-image-action', this.imageAction );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-previous-image', this.previousImage );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-next', this.nextPage );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-finish', this.finish );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-next-image', this.nextImage );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-shaph-previous', this.previousPage );
 	},
 
 	initializePluploader: function() {
@@ -57,32 +62,25 @@ var shareAPhotoApp = Backbone.Model.extend( {
 					percent: file.percent
 				} );
 			});
-			shareAPhoto.App.renderTemplate( '#shaph-page', 'image-editor' );
-			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
 			shareAPhoto.App.isUploading = true;
-			shareAPhoto.App.currentImageIndex = 0;
-			shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
-			shareAPhoto.App.setActionButton();
+			shareAPhoto.App.renderImage( 0 );
 			shareAPhoto.App.uploader.start();
 		},
 
 		uploadProgress: function(up, file) {
-			if ( file.id === shareAPhoto.App.fileList[ shareAPhoto.App.currentImageIndex ].id ) {
-				jQuery( '#shaph-image-percent' ).text( file.percent + '%' );
-			}
+			_.extend( _.findWhere( shareAPhoto.App.fileList, { id: file.id } ), { percent: file.percent } );
+			shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
 		},
 
 		fileUploaded: function( up, file, response ) {
 			var responseObj = JSON.parse( response.response );
 			_.extend( _.findWhere( shareAPhoto.App.fileList, { id: file.id } ), responseObj );
-			if ( file.id === shareAPhoto.App.fileList[ shareAPhoto.App.currentImageIndex ].id ) {
-				shareAPhoto.App.setPreviewImage( responseObj.thumb );
-			}
+			shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
 		},
 
 		uploadComplete: function( up, files ) {
 			shareAPhoto.App.isUploading = false;
-			shareAPhoto.App.setActionButton();
+			shareAPhoto.App.renderButtons();
 		}
 	},
 
@@ -93,34 +91,65 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.currentExtensionIndex = false;
 		shareAPhoto.App.uploader = false;
 		shareAPhoto.App.fileList = [];
+		shareAPhoto.App.extensionData = {};
 		shareAPhoto.App.currentImageIndex = false;
 		shareAPhoto.App.isUploading = false;
 		shareAPhoto.App.scrollY = 0;
 	},
 
-	imageAction: function() {
+	setImageAttributes: function() {
 		jQuery( '.shaph-image-attribute' ).each( function() {
 			shareAPhoto.App.fileList[ shareAPhoto.App.currentImageIndex ][ jQuery( this ).attr( 'name' ) ] = jQuery( this ).val();
 		} );
+	},
 
-		if ( shareAPhoto.App.currentImageIndex + 1 < shareAPhoto.App.fileList.length ) {
-			shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
-			shareAPhoto.App.currentImageIndex++;
-			if ( shareAPhoto.App.fileList[ shareAPhoto.App.currentImageIndex ].thumb ) {
-				shareAPhoto.App.setPreviewImage( shareAPhoto.App.fileList[ shareAPhoto.App.currentImageIndex ].thumb );
-			} else {
-				shareAPhoto.App.setPreviewImage( shareAPhoto.placeholderImage );
-			}
-			shareAPhoto.App.setActionButton();
-		} else if ( shareAPhoto.extensions.length ) {
-			shareAPhoto.App.renderTemplate( '#shaph-page', shareAPhoto.App.extensions[0].name );
+	setExtensionData: function() {
+		jQuery( '.shaph-extension-data' ).each( function() {
+			shareAPhoto.App.extensionData[ jQuery( this ).attr( 'name' ) ] = jQuery( this ).val();
+		} );
+	},
+
+	previousPage: function() {
+		shareAPhoto.App.setExtensionData();
+		if ( shareAPhoto.App.currentExtensionIndex === 0 ) {
+			var imageIndex = shareAPhoto.App.fileList.length - 1;
+			shareAPhoto.App.currentExtensionIndex = false;
+			shareAPhoto.App.renderImage( imageIndex );
 		} else {
-			shareAPhoto.App.finish();
+			shareAPhoto.App.renderExtension( shareAPhoto.App.currentExtensionIndex - 1 );
 		}
 	},
 
+	previousImage: function() {
+		shareAPhoto.App.setImageAttributes();
+		shareAPhoto.App.renderImage( shareAPhoto.App.currentImageIndex - 1 );
+	},
+
+	nextPage: function() {
+		if ( shareAPhoto.App.currentImageIndex ) {
+			shareAPhoto.App.setImageAttributes();
+			shareAPhoto.App.currentImageIndex = false;
+			shareAPhoto.App.renderExtension( 0 );
+		} else {
+			shareAPhoto.App.setExtensionData();
+			shareAPhoto.App.renderExtension( shareAPhoto.App.currentExtensionIndex + 1 );
+		}
+	},
+
+	nextImage: function() {
+		shareAPhoto.App.setImageAttributes();
+		shareAPhoto.App.renderImage( shareAPhoto.App.currentImageIndex + 1 );
+	},
+
 	finish: function() {
+		if ( shareAPhoto.App.currentImageIndex ) {
+			shareAPhoto.App.setImageAttributes();
+		} else {
+			shareAPhoto.App.setExtensionData();
+		}
 		jQuery( '.shaph-footer-buttons input' ).prop( 'disabled', true );
+		shareAPhoto.App.currentExtensionIndex = false;
+		shareAPhoto.App.currentImageIndex = false;
 		jQuery.post(
 			shareAPhoto.processPost,
 			{
@@ -129,6 +158,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			},
 			function( response ) {
 				shareAPhoto.App.renderTemplate( '#shaph-page', 'thank-you', response );
+				shareAPhoto.App.renderButtons();
 				jQuery( '#shaph-cancel' ).attr( 'value', 'Close' );
 			},
 			'json'
@@ -139,7 +169,27 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.scrollY = jQuery( window ).scrollTop();
 		jQuery( '#shaph' ).addClass( 'open' );
 		shareAPhoto.App.renderTemplate( '#shaph-page', 'uploader' );
+		shareAPhoto.App.renderButtons();
 		shareAPhoto.App.initializePluploader();
+	},
+
+	renderImage: function( index ) {
+		shareAPhoto.App.currentImageIndex = index;
+		console.log( shareAPhoto.App.currentImageIndex );
+		shareAPhoto.App.renderTemplate( '#shaph-page', 'image-editor' );
+		shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
+		shareAPhoto.App.renderTemplate( '#shaph-image-attributes', 'image-attributes' );
+		shareAPhoto.App.renderButtons();
+	},
+
+	renderExtension: function( index ) {
+		shareAPhoto.App.currentExtensionIndex = index;
+		shareAPhoto.App.renderTemplate( '#shaph-page', shareAPhoto.extensions[ index ] );
+		shareAPhoto.App.renderButtons();
+	},
+
+	renderButtons: function() {
+		shareAPhoto.App.renderTemplate( '#shaph-footer-buttons', 'footer-buttons' );
 	},
 
 	renderTemplate: function( element, templateName, data ) {
@@ -149,35 +199,14 @@ var shareAPhotoApp = Backbone.Model.extend( {
 				currentImageIndex: shareAPhoto.App.currentImageIndex,
 				isUploading: shareAPhoto.App.isUploading,
 				numExtensions: shareAPhoto.extensions.length,
-				currentExtensionIndex: shareAPhoto.App.currentExtensionIndex
+				currentExtensionIndex: shareAPhoto.App.currentExtensionIndex,
+				placeholderImage : shareAPhoto.placeholderImage
 			},
 			templateData;
 		data = data || {};
 		templateData = _.extend( defaultData, data );
 		jQuery( element ).html( template.setTemplate( templateName ).render( templateData ).el );
 		shareAPhoto.App.setContentHeight();
-	},
-
-	setPreviewImage: function( src ) {
-		jQuery( "#shaph-image-placeholder" ).attr( 'src', src );
-		shareAPhoto.App.setContentHeight();
-	},
-
-	setActionButton: function() {
-
-		if ( shareAPhoto.App.isUploading ) {
-			jQuery( '#shaph-image-action' ).prop( 'disabled', true );
-		} else {
-			jQuery( '#shaph-image-action' ).prop( 'disabled', false );
-		}
-
-		if ( shareAPhoto.App.currentImageIndex + 1 < shareAPhoto.App.fileList.length ) {
-			jQuery( '#shaph-image-action' ).attr( 'value', 'Next Photo' ).prop( 'disabled', false );
-		} else if ( shareAPhoto.extensions.length ) {
-			jQuery( '#shaph-image-action' ).attr( 'value', 'Next' );
-		} else {
-			jQuery( '#shaph-image-action' ).attr( 'value', 'Finish' );
-		}
 	},
 
 	setContentHeight: function() {

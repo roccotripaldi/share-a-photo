@@ -92,6 +92,8 @@ class Share_A_Photo {
         echo $this->print_template( 'thank-you', SHAPH_DIR . '/inc/template.thank-you.php' );
         echo $this->print_template( 'image-editor', SHAPH_DIR . '/inc/template.image-editor.php' );
         echo $this->print_template( 'image-attributes', SHAPH_DIR . '/inc/template.image-attributes.php' );
+        echo $this->print_template( 'image-preview', SHAPH_DIR . '/inc/template.image-preview.php' );
+        echo $this->print_template( 'footer-buttons', SHAPH_DIR . '/inc/template.footer-buttons.php' );
 
         /**
          * Filter the list of optional templates
