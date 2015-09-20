@@ -30,7 +30,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-next', this.nextPage );
 		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-finish', this.finish );
 		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-next-image', this.nextImage );
-		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-shaph-previous', this.previousPage );
+		jQuery( '#shaph-footer-buttons' ).on( 'click', '#shaph-previous', this.previousPage );
 	},
 
 	initializePluploader: function() {
@@ -126,7 +126,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	},
 
 	nextPage: function() {
-		if ( shareAPhoto.App.currentImageIndex ) {
+		if ( shareAPhoto.App.currentImageIndex !== false ) {
 			shareAPhoto.App.setImageAttributes();
 			shareAPhoto.App.currentImageIndex = false;
 			shareAPhoto.App.renderExtension( 0 );
@@ -154,6 +154,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			shareAPhoto.processPost,
 			{
 				files: shareAPhoto.App.fileList,
+				extensionData: shareAPhoto.App.extensionData,
 				nonce: shareAPhoto.nonce
 			},
 			function( response ) {
@@ -200,7 +201,8 @@ var shareAPhotoApp = Backbone.Model.extend( {
 				isUploading: shareAPhoto.App.isUploading,
 				numExtensions: shareAPhoto.extensions.length,
 				currentExtensionIndex: shareAPhoto.App.currentExtensionIndex,
-				placeholderImage : shareAPhoto.placeholderImage
+				placeholderImage : shareAPhoto.placeholderImage,
+				extensionData: shareAPhoto.App.extensionData
 			},
 			templateData;
 		data = data || {};

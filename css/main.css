@@ -96,6 +96,10 @@
     }
 }
 
+#shaph-page {
+    margin: 0 20px 110px 20px;
+}
+
 #shaph-page p {
     font-family: "Open Sans", sans-serif;
     color: #95d4ff;
@@ -122,11 +126,6 @@
     border: none;
     outline: none;
     margin-bottom: 10px;
-}
-
-#shaph-image-editor {
-    margin-bottom: 110px;
-    padding: 0 20px;
 }
 
 #shaph-image-preview {
