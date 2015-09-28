@@ -125,8 +125,8 @@
 
 #shaph-page .text-input {
     background-color: #286592;
-    padding: 10px;
-    width: 90%;
+    padding: 1%;
+    width: 98%;
     font-family: "Open Sans", sans-serif;
     font-size: 14px;
     color: white;
@@ -151,8 +151,11 @@
 
 @media (min-width: 750px) {
     #shaph-image-editor {
+        display: -webkit-flex;
         display: flex;
+        -webkit-justify-content: space-around;
         justify-content: space-around;
+        -webkit-align-items: flex-start;
         align-items: flex-start;
         padding: 0;
     }
