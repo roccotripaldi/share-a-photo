@@ -171,7 +171,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		jQuery( '#shaph' ).addClass( 'open' );
 		shareAPhoto.App.renderTemplate( '#shaph-page', 'uploader' );
 		shareAPhoto.App.renderButtons();
-		jQuery( '#shaph-cancel' ).attr( 'value', 'Cancel' );
+		jQuery( '#shaph-cancel' ).attr( 'value', 'Cancel' ).show();
 		shareAPhoto.App.initializePluploader();
 	},
 

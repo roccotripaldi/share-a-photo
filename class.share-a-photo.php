@@ -212,15 +212,20 @@ class Share_A_Photo {
                 $post_content = '[caption id="attachment_' . $attachment_id . '" align="alignnon" width="' . $attachment_large[1] . '"]' . $post_content . ' ' . $image['caption'] . '[/caption]';
             }
 
+            $post_excerpt = ( empty( $image['caption'] ) ) ? 'Shared photo on ' . get_bloginfo( 'name' ) : $image['caption'];
+
             $post_options = array(
                 'post_title' => $post_title,
                 'post_status' => $post_status,
                 'post_author' => $post_author_id,
                 'post_content' => $post_content,
+                'post_excerpt' => $post_excerpt,
             );
 
             $post_options = apply_filters( 'shaph_pre_post', $post_options, $image );
             $post_id = wp_insert_post( $post_options );
+
+            update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
 
             $attachment_options = array(
                 'ID' => $attachment_id,
