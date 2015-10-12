@@ -7,13 +7,14 @@ class Share_A_Photo {
     public $settings;
 
     function __construct() {
-        add_action( 'init', array( $this, 'register_assets' ) );
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_stylesheets' ) );
-        if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo_upload'] ) ) {
-            add_action( 'init', array( $this, 'process_upload' ) );
-        }
-        if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_GET['share_a_photo_finish'] ) ) {
-            add_action( 'init', array( $this, 'finish' ) );
+        if ( is_admin() ) {
+            add_action( 'wp_ajax_shareaphoto_upload', array( $this, 'process_upload' ) );
+            add_action( 'wp_ajax_nopriv_shareaphoto_upload', array( $this, 'process_upload' ) );
+            add_action( 'wp_ajax_shareaphoto_finish', array( $this, 'finish' ) );
+            add_action( 'wp_ajax_nopriv_shareaphoto_finish', array( $this, 'finish' ) );
+        } else {
+            add_action( 'init', array( $this, 'register_assets' ) );
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_stylesheets' ) );
         }
     }
 
@@ -38,21 +39,6 @@ class Share_A_Photo {
 
         wp_register_script( 'shaph-js', $shaph_js, $shaph_js_dependencies );
         wp_register_style( 'shaph-css', $shaph_css );
-
-        $shaph_js_data = array(
-            'App' => false,
-            'nonce' => wp_create_nonce( 'shaph_upload' ),
-            'pageEnclosure' => '#page',
-            'processUpload' => '/?share_a_photo_upload=true',
-            'processPost' => '/?share_a_photo_finish=true',
-            'placeholderImage' => SHAPH_PATH . 'images/placeholder.png',
-        );
-
-        $extensions = $this->get_extensions();
-        $shaph_js_data['extensions'] = array_keys( $extensions );
-
-        $shaph_js_data = apply_filters( 'shaph-js-data', $shaph_js_data );
-        wp_localize_script( 'shaph-js', 'shareAPhoto', $shaph_js_data );
     }
 
     /**
@@ -76,6 +62,20 @@ class Share_A_Photo {
     }
 
     function print_javascripts() {
+        $shaph_js_data = array(
+            'App' => false,
+            'nonce' => wp_create_nonce( 'shaph_upload' ),
+            'pageEnclosure' => '#page',
+            'processUpload' => 'shareaphoto_upload',
+            'processPost' => 'shareaphoto_finish',
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'placeholderImage' => SHAPH_PATH . 'images/placeholder.png',
+        );
+        $extensions = $this->get_extensions();
+        $shaph_js_data['extensions'] = array_keys( $extensions );
+
+        $shaph_js_data = apply_filters( 'shaph-js-data', $shaph_js_data );
+        wp_localize_script( 'shaph-js', 'shareAPhoto', $shaph_js_data );
         wp_print_scripts( 'shaph-js' );
         $this->print_templates();
     }

@@ -36,14 +36,15 @@ var shareAPhotoApp = Backbone.Model.extend( {
 	initializePluploader: function() {
 		shareAPhoto.App.uploader = new plupload.Uploader({
 			browse_button: 'shaph-browse',
-			url: shareAPhoto.processUpload,
+			url: shareAPhoto.ajax_url,
 			filters: {
 				mime_types: [
 					{ title: 'Images', extensions: 'jpg,gif,png' }
 				]
 			},
 			multipart_params: {
-				nonce: shareAPhoto.nonce
+				nonce: shareAPhoto.nonce,
+				action: shareAPhoto.processUpload
 			}
 		});
 		shareAPhoto.App.uploader.init();
@@ -69,13 +70,17 @@ var shareAPhotoApp = Backbone.Model.extend( {
 
 		uploadProgress: function(up, file) {
 			_.extend( _.findWhere( shareAPhoto.App.fileList, { id: file.id } ), { percent: file.percent } );
-			shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
+			if ( shareAPhoto.App.currentImageIndex !== false ) {
+				shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
+			}
 		},
 
 		fileUploaded: function( up, file, response ) {
 			var responseObj = JSON.parse( response.response );
 			_.extend( _.findWhere( shareAPhoto.App.fileList, { id: file.id } ), responseObj );
-			shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
+			if ( shareAPhoto.App.currentImageIndex !== false ) {
+				shareAPhoto.App.renderTemplate( '#shaph-image-preview', 'image-preview' );
+			}
 		},
 
 		uploadComplete: function( up, files ) {
@@ -151,11 +156,12 @@ var shareAPhotoApp = Backbone.Model.extend( {
 		shareAPhoto.App.currentExtensionIndex = false;
 		shareAPhoto.App.currentImageIndex = false;
 		jQuery.post(
-			shareAPhoto.processPost,
+			shareAPhoto.ajax_url,
 			{
 				files: shareAPhoto.App.fileList,
 				extensionData: shareAPhoto.App.extensionData,
-				nonce: shareAPhoto.nonce
+				nonce: shareAPhoto.nonce,
+				action: shareAPhoto.processPost,
 			},
 			function( response ) {
 				shareAPhoto.App.renderTemplate( '#shaph-page', 'thank-you', response );
