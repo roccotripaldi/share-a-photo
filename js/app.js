@@ -39,7 +39,7 @@ var shareAPhotoApp = Backbone.Model.extend( {
 			url: shareAPhoto.ajax_url,
 			filters: {
 				mime_types: [
-					{ title: 'Images', extensions: 'jpg,gif,png' }
+					{ title: 'Images', extensions: 'jpg,jpeg,gif,png' }
 				]
 			},
 			multipart_params: {
